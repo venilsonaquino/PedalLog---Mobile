@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/SessionListFragment">
+
+    <fragment
+        android:id="@+id/SessionListFragment"
+        android:name="com.pedallog.app.ui.map.SessionListFragment"
+        android:label="Minhas Rotas"
+        tools:layout="@layout/fragment_session_list">
+        <action
+            android:id="@+id/action_SessionListFragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/MapFragment"
+        android:name="com.pedallog.app.ui.map.MapFragment"
+        android:label="Detalhe da Sessão"
+        tools:layout="@layout/fragment_map" />
+</navigation>

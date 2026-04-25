@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:background="@drawable/card_bg"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/badge_bg"
+        android:padding="12dp"
+        android:src="@drawable/ic_route"
+        app:tint="@color/emerald_green"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        tools:text="24 de abr. de 2026"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tvTime"
+        app:layout_constraintStart_toEndOf="@id/ivIcon"
+        app:layout_constraintTop_toTopOf="@id/ivIcon" />
+
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="20:22"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvDate"
+        app:layout_constraintBottom_toBottomOf="@id/tvDate" />
+
+    <LinearLayout
+        android:id="@+id/llMetrics"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@id/tvDate"
+        app:layout_constraintTop_toBottomOf="@id/tvDate"
+        app:layout_constraintEnd_toStartOf="@id/btnDelete">
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_pin"
+            app:tint="@color/emerald_green" />
+
+        <TextView
+            android:id="@+id/tvDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            tools:text="1.79 km"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_clock"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/tvDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            tools:text="5m 0s"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvUuid"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="ID: mock-modjj0h3-ra1qco3"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintStart_toStartOf="@id/tvDate"
+        app:layout_constraintTop_toBottomOf="@id/llMetrics"
+        app:layout_constraintEnd_toStartOf="@id/btnDelete" />
+
+    <ImageView
+        android:id="@+id/btnDelete"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="6dp"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/delete_red"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

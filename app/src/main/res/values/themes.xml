@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.PedalLogMobile" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/emerald_green</item>
+        <item name="colorSecondary">@color/emerald_green_dark</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <style name="Theme.PedalLogMobile" parent="Base.Theme.PedalLogMobile" />
+</resources>

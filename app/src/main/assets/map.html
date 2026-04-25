@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PedalLog Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100vw; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([-23.5505, -46.6333], 13); // Default view (São Paulo)
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors, © CARTO'
+        }).addTo(map);
+
+        var currentLayer = null;
+
+        function drawTrack(geoJsonString) {
+            try {
+                var geoJsonData = JSON.parse(geoJsonString);
+
+                if (currentLayer) {
+                    map.removeLayer(currentLayer);
+                }
+
+                currentLayer = L.geoJSON(geoJsonData, {
+                    style: function (feature) {
+                        return {color: "#2ECC71", weight: 5, opacity: 0.9};
+                    }
+                }).addTo(map);
+
+                map.fitBounds(currentLayer.getBounds());
+                
+                // Notify Android that the map is ready/drawn
+                if (window.Android) {
+                    window.Android.onMapReady();
+                }
+
+            } catch(e) {
+                console.error("Error parsing GeoJSON:", e);
+                if (window.Android) {
+                    window.Android.onError(e.toString());
+                }
+            }
+        }
+    </script>
+</body>
+</html>
