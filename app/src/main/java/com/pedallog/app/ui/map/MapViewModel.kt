@@ -49,7 +49,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 val messageClient = Wearable.getMessageClient(getApplication<Application>())
                 
                 val nodes = nodeClient.connectedNodes.await()
-                Log.d("MapViewModel", "Nós encontrados: ${nodes.size}")
+                Log.d("MapViewModel", "Relógios encontrados: ${nodes.size}")
                 if (nodes.isEmpty()) {
                     _uiEvent.emit(UiEvent.ShowToast("Nenhum relógio conectado via Bluetooth"))
                     return@launch
@@ -59,11 +59,11 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 for (node in nodes) {
                     messageClient.sendMessage(node.id, "/request_sync", null).await()
                     sentCount++
-                    Log.d("MapViewModel", "Mensagem enviada para nó: ${node.displayName} (${node.id})")
+                    Log.d("MapViewModel", "Solicitação enviada para: ${node.displayName}")
                 }
                 
                 if (sentCount > 0) {
-                    _uiEvent.emit(UiEvent.ShowToast("Sincronização solicitada ($sentCount relógios)"))
+                    _uiEvent.emit(UiEvent.ShowToast("Sincronização solicitada ao relógio. Aguarde..."))
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowToast("Erro ao solicitar sincronização: ${e.message}"))
