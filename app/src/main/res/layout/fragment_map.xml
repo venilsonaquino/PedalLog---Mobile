@@ -1,177 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_dark">
 
-    <!-- Top Bar -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/card_bg"
-        android:padding="8dp"
-        android:src="?attr/homeAsUpIndicator"
-        app:tint="@color/text_primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- ══ Full-screen map background ══════════════════════════════════════ -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_dark" />
 
-    <TextView
-        android:id="@+id/tvDetailTitle"
+    <!-- ══ Loading indicator — shown while DB data is being processed ═══════ -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/loadingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Detalhe da Sessão"
-        android:textColor="@color/text_primary"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/btnBack"
-        app:layout_constraintTop_toTopOf="@id/btnBack"
-        app:layout_constraintBottom_toTopOf="@id/tvDetailUuid" />
+        android:layout_gravity="center"
+        android:layout_marginBottom="160dp"
+        app:indicatorColor="@color/emerald_green"
+        app:trackColor="#22ffffff"
+        app:indicatorSize="48dp"
+        app:trackThickness="4dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/tvDetailUuid"
-        android:layout_width="0dp"
+    <!-- ══ Top bar overlay (gradient fade top→transparent) ════════════════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="24dp"
-        tools:text="mock-modjj0h3-ra1qco3"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:singleLine="true"
-        android:ellipsize="end"
-        app:layout_constraintStart_toEndOf="@id/btnBack"
-        app:layout_constraintTop_toBottomOf="@id/tvDetailTitle"
-        app:layout_constraintBottom_toBottomOf="@id/btnBack"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity="top"
+        android:background="@drawable/top_bar_gradient"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="24dp"
+        android:gravity="center_vertical">
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"
-        app:layout_constraintBottom_toBottomOf="parent">
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/card_bg"
+            android:padding="8dp"
+            android:src="?attr/homeAsUpIndicator"
+            app:tint="@color/text_primary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Dom, 26 abr · 12:47"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailUuid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Detalhe da Sessão"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ══ Persistent Bottom Sheet ═════════════════════════════════════════
+         peekHeight = handle (28dp) + summary strip (~60dp) ≈ 88dp
+         isFitToContents=false enables 3 states: collapsed / half / expanded
+    ════════════════════════════════════════════════════════════════════════ -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/bottomSheetContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bottom_sheet_bg"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_peekHeight="92dp"
+        app:behavior_hideable="false"
+        app:behavior_skipCollapsed="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="40dp">
 
-            <!-- WebView for Leaflet -->
-            <androidx.cardview.widget.CardView
+            <!-- ── Drag handle ─────────────────────────────────────────── -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="@color/card_dark"
-                app:cardElevation="0dp">
+                android:layout_height="28dp"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-                <WebView
-                    android:id="@+id/webView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/card_dark" />
-            </androidx.cardview.widget.CardView>
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="#40ffffff" />
+            </LinearLayout>
 
-            <!-- Metrics Grid -->
-            <GridLayout
+            <!-- ── Peek summary strip: Distance + Duration ────────────── -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:columnCount="2"
-                android:rowCount="3"
-                android:useDefaultMargins="true">
+                android:layout_height="64dp"
+                android:orientation="horizontal"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:gravity="center_vertical">
 
-                <!-- Distance -->
+                <!-- Distance (emerald, prominent) -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:background="@drawable/badge_bg"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvMetricDistance"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        tools:text="1.79 km"
+                        android:textColor="@color/emerald_green"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_pin"
-                            app:tint="@color/emerald_green" />
-
-                        <TextView
-                            android:id="@+id/tvMetricDistance"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            tools:text="1.79 km"
-                            android:textColor="@color/emerald_green"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginStart="24dp"
                         android:text="Distância"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
+
+                <!-- Separator -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="32dp"
+                    android:background="#22ffffff"
+                    android:layout_marginHorizontal="16dp" />
 
                 <!-- Duration -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:background="@drawable/card_bg"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginBottom="8dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvMetricDuration"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        tools:text="00:32:15"
+                        android:textColor="@color/text_primary"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_clock"
-                            app:tint="@color/text_secondary" />
-
-                        <TextView
-                            android:id="@+id/tvMetricDuration"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            tools:text="5m 0s"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginStart="24dp"
                         android:text="Duração"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── Thin divider ───────────────────────────────────────── -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#14ffffff"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- ══ Expanded content ══════════════════════════════════════ -->
+
+            <!-- ── Metrics: Avg Speed / Max Speed / GPS Points ────────── -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:columnCount="2"
+                android:useDefaultMargins="true">
 
                 <!-- Avg Speed -->
                 <LinearLayout
@@ -180,9 +201,9 @@
                     android:layout_columnWeight="1"
                     android:background="@drawable/card_bg"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp">
+                    android:padding="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -222,9 +243,9 @@
                     android:layout_columnWeight="1"
                     android:background="@drawable/card_bg"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginBottom="8dp">
+                    android:padding="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="10dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -257,15 +278,15 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- GPS Points -->
+                <!-- GPS Points (spans 2 columns) -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
+                    android:layout_columnSpan="2"
                     android:background="@drawable/card_bg"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:layout_marginEnd="8dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -300,11 +321,12 @@
 
             </GridLayout>
 
-            <!-- Speed Chart -->
+            <!-- ── Speed Chart ────────────────────────────────────────── -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="12dp"
                 app:cardCornerRadius="16dp"
                 app:cardBackgroundColor="@color/card_dark"
                 app:cardElevation="0dp">
@@ -318,9 +340,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Velocidade ao longo do tempo"
+                        android:text="VELOCIDADE AO LONGO DO TEMPO"
                         android:textColor="@color/text_secondary"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.08"
                         android:layout_marginBottom="8dp" />
@@ -332,12 +354,13 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Technical UUID (discrete, bottom) -->
+            <!-- ── Technical UUID ─────────────────────────────────────── -->
             <TextView
                 android:id="@+id/tvTechnicalUuid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="24dp"
                 android:gravity="center"
                 android:textColor="#33ffffff"
                 android:textSize="10sp"
@@ -345,5 +368,6 @@
                 tools:text="UUID · mock-modjj0h3-ra1qco3" />
 
         </LinearLayout>
-    </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

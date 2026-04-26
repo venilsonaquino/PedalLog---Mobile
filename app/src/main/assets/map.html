@@ -32,7 +32,7 @@
         /* Bottom-right controls */
         #bottom-controls {
             right: 12px;
-            bottom: 20px;
+            bottom: 110px;
             gap: 8px;
         }
 
@@ -296,6 +296,36 @@
         // Receives [{"lat":x,"lng":y,"spd":z}] for popup
         function drawPoints(pointsJson) {
             try { trackPoints = JSON.parse(pointsJson); } catch(e) {}
+        }
+
+        // ── Chart replay marker ───────────────────────────────────────────────
+        var replayMarker = null;
+        var replayMarkerStyle = [
+            '.replay-marker {',
+            '  width: 14px; height: 14px;',
+            '  border-radius: 50%;',
+            '  background: #ffffff;',
+            '  border: 2.5px solid #2ECC71;',
+            '  box-shadow: 0 0 0 3px rgba(46,204,113,0.25);',
+            '  pointer-events: none;',
+            '}'
+        ].join('');
+        (function(){ var s = document.createElement('style'); s.textContent = replayMarkerStyle; document.head.appendChild(s); })();
+
+        function moveMarker(lat, lng, speed) {
+            var ll = L.latLng(lat, lng);
+            if (!replayMarker) {
+                replayMarker = L.marker(ll, {
+                    icon: L.divIcon({ className: 'replay-marker', iconSize: [14, 14], iconAnchor: [7, 7] }),
+                    zIndexOffset: 1000
+                }).addTo(map);
+            } else {
+                replayMarker.setLatLng(ll);
+            }
+        }
+
+        function hideMarker() {
+            if (replayMarker) { map.removeLayer(replayMarker); replayMarker = null; }
         }
 
         function invalidateAndFocus() {

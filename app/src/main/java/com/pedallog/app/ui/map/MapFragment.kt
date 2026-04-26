@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.pedallog.app.databinding.FragmentMapBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -28,17 +29,10 @@ class MapFragment : Fragment() {
 
     private val viewModel: MapViewModel by activityViewModels()
 
-    /** GeoJSON waiting to be drawn once the page has fully loaded */
     private var pendingDetails: SessionMetrics? = null
-
-    /** True once onPageFinished has fired for our map.html */
     private var pageLoaded = false
 
-    // Date formatter for the header — e.g. "Dom, 26 abr · 12:47"
     private val headerDateFormat = SimpleDateFormat("EEE, dd MMM · HH:mm", Locale("pt", "BR"))
-
-    // Minimal formatter for the technical UUID area at the bottom
-    private val fullDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,12 +46,23 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
-        }
+        binding.btnBack.setOnClickListener { findNavController().navigateUp() }
 
+        // Item 3: Show loading indicator while waiting for data
+        showLoading(true)
+
+        setupBottomSheet()
         setupWebView()
         observeSession()
+    }
+
+    private fun setupBottomSheet() {
+        val behavior = BottomSheetBehavior.from(binding.bottomSheetContainer)
+        behavior.isFitToContents = false
+        behavior.halfExpandedRatio = 0.42f
+        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        behavior.isHideable = false
+        behavior.skipCollapsed = false
     }
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
@@ -77,7 +82,6 @@ class MapFragment : Fragment() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     pageLoaded = true
-                    // Draw any details that arrived before the page was ready
                     pendingDetails?.let { d ->
                         drawToMap(d)
                         pendingDetails = null
@@ -89,6 +93,7 @@ class MapFragment : Fragment() {
             loadUrl("file:///android_asset/map.html")
         }
 
+        // Let WebView consume pan/pinch without CoordinatorLayout interference
         binding.webView.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN,
@@ -105,6 +110,7 @@ class MapFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.currentSessionDetails.collect { details ->
                     if (details != null) {
+                        showLoading(false)   // Item 3: hide spinner once data arrives
                         updateUI(details)
                         updateMap(details)
                     }
@@ -120,60 +126,70 @@ class MapFragment : Fragment() {
         }
     }
 
+    private fun showLoading(visible: Boolean) {
+        binding.loadingIndicator.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
     private fun updateUI(details: SessionMetrics) {
         val session = details.session
 
-        // ── Item 1: Human-readable header ─────────────────────────────────────
-        val startDate = Date(session.startTime)
-        binding.tvDetailTitle.text = headerDateFormat.format(startDate)
-            .replaceFirstChar { it.uppercase() }   // capitalize first letter
-
-        // Small subtitle below the date (replaces the old UUID in the header)
+        // Header — human-readable date
+        binding.tvDetailTitle.text = headerDateFormat
+            .format(Date(session.startTime))
+            .replaceFirstChar { it.uppercase() }
         binding.tvDetailUuid.text = "Detalhe da Sessão"
 
-        // Technical UUID at the bottom (discrete)
+        // Technical UUID (bottom)
         binding.tvTechnicalUuid.text = "UUID · ${session.syncUuid}"
 
-        // ── Metrics ────────────────────────────────────────────────────────────
+        // Metrics
         binding.tvMetricDistance.text = details.formattedDistance
         binding.tvMetricDuration.text = details.formattedDuration
-        binding.tvMetricAvgSpeed.text = String.format(Locale.US, "%.1f km/h", details.avgSpeedKmH)
-        binding.tvMetricMaxSpeed.text = String.format(Locale.US, "%.1f km/h", details.maxSpeedKmH)
-        binding.tvMetricPoints.text = details.gpsPointsCount.toString()
+        binding.tvMetricAvgSpeed.text  = String.format(Locale.US, "%.1f km/h", details.avgSpeedKmH)
+        binding.tvMetricMaxSpeed.text  = String.format(Locale.US, "%.1f km/h", details.maxSpeedKmH)
+        binding.tvMetricPoints.text    = details.gpsPointsCount.toString()
 
-        // ── Item 3: Speed chart ────────────────────────────────────────────────
-        SpeedChartHelper.setup(binding.speedChart, details.trackPoints)
+        // Item 1+2+3: Chart with live WebView reference for map sync
+        SpeedChartHelper.setup(binding.speedChart, details.trackPoints, binding.webView)
     }
 
     private fun updateMap(details: SessionMetrics) {
         if (details.geoJson == null) return
-        if (!pageLoaded) {
-            pendingDetails = details
-            return
-        }
+        if (!pageLoaded) { pendingDetails = details; return }
         drawToMap(details)
     }
 
-    /** Sends GeoJSON polyline + speed-point array to Leaflet */
     private fun drawToMap(details: SessionMetrics) {
         val geoJson = details.geoJson ?: return
-
-        // 1. Draw the polyline
         val escapedGeoJson = geoJson.replace("'", "\\'")
         binding.webView.evaluateJavascript("javascript:drawTrack('$escapedGeoJson')", null)
 
-        // 2. Send speed points for the popup
         if (details.trackPoints.isNotEmpty()) {
             val pointsJson = details.trackPoints.joinToString(",", "[", "]") { pt ->
                 """{"lat":${pt.lat},"lng":${pt.lng},"spd":${pt.speedKmH}}"""
             }
-            val escapedPoints = pointsJson.replace("'", "\\'")
-            binding.webView.evaluateJavascript("javascript:drawPoints('$escapedPoints')", null)
+            binding.webView.evaluateJavascript(
+                "javascript:drawPoints('${pointsJson.replace("'", "\\'")}');", null
+            )
         }
     }
 
+    // ── Item 4: Memory leak prevention ────────────────────────────────────────
     override fun onDestroyView() {
         super.onDestroyView()
+
+        // Clear chart listeners before nulling the binding
+        SpeedChartHelper.clear(binding.speedChart)
+
+        // Release WebView resources (clears cache, stops loads, frees memory)
+        binding.webView.apply {
+            stopLoading()
+            clearCache(false)       // false = keep disk cache, clear memory cache
+            clearHistory()
+            loadUrl("about:blank")  // unload the page so JS is released
+            destroy()
+        }
+
         _binding = null
         pageLoaded = false
         pendingDetails = null
