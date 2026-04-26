@@ -116,6 +116,8 @@ class MapFragment : Fragment() {
         }
     }
 
+
+
     override fun onResume() {
         super.onResume()
         // Every time the user enters this screen, force Leaflet to
@@ -129,7 +131,6 @@ class MapFragment : Fragment() {
         val session = details.session
 
         binding.tvDetailUuid.text = session.syncUuid
-        binding.tvMetricUuid.text = session.syncUuid
 
         binding.tvMetricDistance.text = details.formattedDistance
         binding.tvMetricDuration.text = details.formattedDuration

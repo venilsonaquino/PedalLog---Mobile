@@ -90,6 +90,9 @@ class SessionListFragment : Fragment() {
                             is UiEvent.ShowToast -> {
                                 android.widget.Toast.makeText(requireContext(), event.message, android.widget.Toast.LENGTH_SHORT).show()
                             }
+                            is UiEvent.ShareGpx -> {
+                                // GPX sharing is handled by MapFragment — no-op here
+                            }
                         }
                     }
                 }
