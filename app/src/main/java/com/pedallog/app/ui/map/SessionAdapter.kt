@@ -51,8 +51,8 @@ class SessionAdapter(
             
             binding.tvDistance.text = String.format(Locale.US, "%.2f km", session.distanceKm)
             
-            // In the card, the user wants tvDuration to show the Start Time
-            binding.tvDuration.text = timeFormat.format(date)
+            // Show start time in top right (tvTime) and duration in metrics row (tvDuration)
+            binding.tvDuration.text = session.getFormattedDuration()
             
             binding.tvUuid.text = "ID: ${session.syncUuid}"
         }

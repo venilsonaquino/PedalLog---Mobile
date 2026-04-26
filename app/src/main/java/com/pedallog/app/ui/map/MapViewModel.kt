@@ -12,9 +12,12 @@ import com.pedallog.app.domain.usecase.GetGeoJsonPathUseCase
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -34,6 +37,10 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _sessions = MutableStateFlow<List<PedalSession>>(emptyList())
     val sessions: StateFlow<List<PedalSession>> = _sessions
+
+    val totalDistanceKm: StateFlow<Double> = _sessions
+        .map { sessions -> sessions.sumOf { it.distanceKm } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     init {
         val database = AppDatabase.getDatabase(application)

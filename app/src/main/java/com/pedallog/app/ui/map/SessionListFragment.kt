@@ -45,10 +45,6 @@ class SessionListFragment : Fragment() {
         binding.btnSync.setOnClickListener {
             viewModel.requestManualSync()
         }
-        
-        binding.btnClearAll.setOnClickListener {
-            viewModel.deleteAllSessions()
-        }
     }
 
     private fun setupRecyclerView() {
@@ -70,11 +66,13 @@ class SessionListFragment : Fragment() {
                 launch {
                     viewModel.sessions.collect { sessions ->
                         sessionAdapter.submitList(sessions)
-                        
-                        val totalDistance = sessions.sumOf { it.distanceKm }
-                        binding.tvTotalDistance.text = String.format(Locale.US, "%.2f km", totalDistance)
-                        
                         binding.tvSessionsSubHeader.text = "${sessions.size} pedais registrados"
+                    }
+                }
+
+                launch {
+                    viewModel.totalDistanceKm.collect { totalDistance ->
+                        binding.tvTotalDistance.text = String.format(Locale.US, "%.2f km", totalDistance)
                     }
                 }
 
