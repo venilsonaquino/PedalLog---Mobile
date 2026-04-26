@@ -3,6 +3,7 @@ package com.pedallog.app.ui.map
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import android.util.Log
 import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.repository.PedalRepositoryImpl
 import com.pedallog.app.domain.model.PedalSession
@@ -48,19 +49,21 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 val messageClient = Wearable.getMessageClient(getApplication<Application>())
                 
                 val nodes = nodeClient.connectedNodes.await()
+                Log.d("MapViewModel", "Nós encontrados: ${nodes.size}")
                 if (nodes.isEmpty()) {
                     _uiEvent.emit(UiEvent.ShowToast("Nenhum relógio conectado via Bluetooth"))
                     return@launch
                 }
                 
-                var sent = false
+                var sentCount = 0
                 for (node in nodes) {
                     messageClient.sendMessage(node.id, "/request_sync", null).await()
-                    sent = true
+                    sentCount++
+                    Log.d("MapViewModel", "Mensagem enviada para nó: ${node.displayName} (${node.id})")
                 }
                 
-                if (sent) {
-                    _uiEvent.emit(UiEvent.ShowToast("Solicitação de sincronização enviada!"))
+                if (sentCount > 0) {
+                    _uiEvent.emit(UiEvent.ShowToast("Sincronização solicitada ($sentCount relógios)"))
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowToast("Erro ao solicitar sincronização: ${e.message}"))
@@ -80,19 +83,30 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadSessionTrack(session: PedalSession) {
         viewModelScope.launch {
-            val points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
-            val geoJson = if (points.isNotEmpty()) getGeoJsonPathUseCase.invoke(points) else null
+            _currentSessionDetails.value = null // Limpa estado anterior
             
-            var maxSpeed = 0f
-            if (points.isNotEmpty()) {
-                maxSpeed = points.maxOf { it.speed }
+            var points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
+            
+            Log.d("PedalDebug", "Session UUID: ${session.syncUuid}, Points found (by UUID): ${points.size}")
+            
+            if (points.isEmpty()) {
+                val sessionId = repository.getSessionIdByUuid(session.syncUuid)
+                if (sessionId != null) {
+                    points = repository.getPointsBySessionId(sessionId).firstOrNull() ?: emptyList()
+                    Log.d("PedalDebug", "Fallback - Session ID: $sessionId, Points found (by ID): ${points.size}")
+                }
             }
+
+            val geoJson = if (points.isNotEmpty()) getGeoJsonPathUseCase.invoke(points) else null
             
             _currentSessionDetails.value = SessionMetrics(
                 session = session,
                 geoJson = geoJson,
                 gpsPointsCount = points.size,
-                maxSpeed = maxSpeed
+                maxSpeedKmH = session.calculateMaxSpeedKmH(points),
+                avgSpeedKmH = session.calculateAverageSpeedKmH(points),
+                formattedDuration = session.getFormattedDuration(),
+                formattedDistance = session.getFormattedDistance()
             )
         }
     }
@@ -102,13 +116,22 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             repository.deleteSession(syncUuid)
         }
     }
+
+    fun deleteAllSessions() {
+        viewModelScope.launch {
+            repository.deleteAllSessions()
+        }
+    }
 }
 
 data class SessionMetrics(
     val session: PedalSession,
     val geoJson: String?,
     val gpsPointsCount: Int,
-    val maxSpeed: Float
+    val maxSpeedKmH: Float,
+    val avgSpeedKmH: Float,
+    val formattedDuration: String,
+    val formattedDistance: String
 )
 
 sealed class UiEvent {

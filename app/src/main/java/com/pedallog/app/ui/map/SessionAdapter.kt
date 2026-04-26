@@ -51,14 +51,8 @@ class SessionAdapter(
             
             binding.tvDistance.text = String.format(Locale.US, "%.2f km", session.distanceKm)
             
-            val durationMs = session.endTime - session.startTime
-            val minutes = (durationMs / (1000 * 60)) % 60
-            val hours = durationMs / (1000 * 60 * 60)
-            binding.tvDuration.text = if (hours > 0) {
-                "${hours}h ${minutes}m"
-            } else {
-                "${minutes}m ${(durationMs / 1000) % 60}s"
-            }
+            // In the card, the user wants tvDuration to show the Start Time
+            binding.tvDuration.text = timeFormat.format(date)
             
             binding.tvUuid.text = "ID: ${session.syncUuid}"
         }

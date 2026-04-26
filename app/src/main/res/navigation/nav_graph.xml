@@ -20,4 +20,10 @@
         android:name="com.pedallog.app.ui.map.MapFragment"
         android:label="Detalhe da Sessão"
         tools:layout="@layout/fragment_map" />
+
+    <fragment
+        android:id="@+id/SettingsFragment"
+        android:name="com.pedallog.app.ui.map.SettingsFragment"
+        android:label="Configurações"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

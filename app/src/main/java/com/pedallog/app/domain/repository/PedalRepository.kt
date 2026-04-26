@@ -8,6 +8,9 @@ interface PedalRepository {
     suspend fun saveSessionWithPoints(session: PedalSession, points: List<PedalPoint>)
     fun getAllSessions(): Flow<List<PedalSession>>
     fun getPointsForSession(syncUuid: String): Flow<List<PedalPoint>>
+    fun getPointsBySessionId(sessionId: Long): Flow<List<PedalPoint>>
+    suspend fun getSessionIdByUuid(syncUuid: String): Long?
     suspend fun sessionExists(syncUuid: String): Boolean
     suspend fun deleteSession(syncUuid: String)
+    suspend fun deleteAllSessions()
 }

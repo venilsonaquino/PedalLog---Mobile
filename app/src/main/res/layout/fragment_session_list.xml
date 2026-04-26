@@ -42,6 +42,18 @@
         app:layout_constraintBottom_toBottomOf="@id/tvAppTitle" />
 
     <ImageButton
+        android:id="@+id/btnClearAll"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="@id/totalDistanceBadge"
+        app:layout_constraintEnd_toStartOf="@id/btnSync"
+        app:layout_constraintTop_toTopOf="@id/totalDistanceBadge" />
+
+    <ImageButton
         android:id="@+id/btnSync"
         android:layout_width="40dp"
         android:layout_height="40dp"

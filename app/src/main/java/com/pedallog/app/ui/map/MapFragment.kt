@@ -70,19 +70,11 @@ class MapFragment : Fragment() {
         binding.tvDetailUuid.text = session.syncUuid
         binding.tvMetricUuid.text = session.syncUuid
         
-        binding.tvMetricDistance.text = String.format(Locale.US, "%.2f km", session.distanceKm)
+        binding.tvMetricDistance.text = details.formattedDistance
+        binding.tvMetricDuration.text = details.formattedDuration
         
-        val durationMs = session.endTime - session.startTime
-        val minutes = (durationMs / (1000 * 60)) % 60
-        val hours = durationMs / (1000 * 60 * 60)
-        binding.tvMetricDuration.text = if (hours > 0) {
-            "${hours}h ${minutes}m"
-        } else {
-            "${minutes}m ${(durationMs / 1000) % 60}s"
-        }
-        
-        binding.tvMetricAvgSpeed.text = String.format(Locale.US, "%.1f km/h", session.averageSpeed * 3.6f)
-        binding.tvMetricMaxSpeed.text = String.format(Locale.US, "%.1f km/h", details.maxSpeed * 3.6f)
+        binding.tvMetricAvgSpeed.text = String.format(Locale.US, "%.1f km/h", details.avgSpeedKmH)
+        binding.tvMetricMaxSpeed.text = String.format(Locale.US, "%.1f km/h", details.maxSpeedKmH)
         binding.tvMetricPoints.text = details.gpsPointsCount.toString()
     }
 

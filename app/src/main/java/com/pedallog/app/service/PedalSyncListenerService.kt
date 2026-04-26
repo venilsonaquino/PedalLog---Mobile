@@ -56,6 +56,7 @@ class PedalSyncListenerService : WearableListenerService() {
                 val pointsGzip = dataMap.getByteArray("points_gz")
                 
                 if (syncUuid != null && pointsGzip != null) {
+                    Log.d("SyncService", "Processando sessão: $syncUuid, Dist: $totalDistance, Gzip: ${pointsGzip.size} bytes")
                     scope.launch {
                         try {
                             val durationSec = (endTime - startTime) / 1000.0
@@ -77,13 +78,16 @@ class PedalSyncListenerService : WearableListenerService() {
                             
                             Log.d("SyncService", "Salvando sessão $syncUuid com ${points.size} pontos")
                             saveSyncedPedalUseCase(session, points)
+                            Log.d("SyncService", "Sessão $syncUuid salva com sucesso!")
                             
                             val distanceFormatted = String.format("%.2f", session.distanceKm)
                             sendNotification("Novo pedal de $distanceFormatted km sincronizado!")
                         } catch (e: Exception) {
-                            Log.e("SyncService", "Error processing synced data for $syncUuid", e)
+                            Log.e("SyncService", "Erro ao processar dados sincronizados para $syncUuid: ${e.message}", e)
                         }
                     }
+                } else {
+                    Log.w("SyncService", "Dados incompletos recebidos: syncUuid=$syncUuid, pointsGzip=${pointsGzip?.size}")
                 }
             }
         }

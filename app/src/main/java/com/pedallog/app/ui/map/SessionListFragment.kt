@@ -45,6 +45,10 @@ class SessionListFragment : Fragment() {
         binding.btnSync.setOnClickListener {
             viewModel.requestManualSync()
         }
+        
+        binding.btnClearAll.setOnClickListener {
+            viewModel.deleteAllSessions()
+        }
     }
 
     private fun setupRecyclerView() {

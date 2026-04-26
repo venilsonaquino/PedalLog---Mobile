@@ -37,11 +37,25 @@ class PedalRepositoryImpl(
         }
     }
 
+    override fun getPointsBySessionId(sessionId: Long): Flow<List<PedalPoint>> {
+        return db.pedalDao().getPointsBySessionId(sessionId).map { entities ->
+            entities.map { PedalMapper.toDomainPoint(it) }
+        }
+    }
+
+    override suspend fun getSessionIdByUuid(syncUuid: String): Long? = withContext(Dispatchers.IO) {
+        return@withContext db.pedalDao().getSessionByUuid(syncUuid)?.id
+    }
+
     override suspend fun sessionExists(syncUuid: String): Boolean = withContext(Dispatchers.IO) {
         return@withContext db.pedalDao().getSessionByUuid(syncUuid) != null
     }
 
     override suspend fun deleteSession(syncUuid: String) = withContext(Dispatchers.IO) {
         db.pedalDao().deleteSession(syncUuid)
+    }
+
+    override suspend fun deleteAllSessions() = withContext(Dispatchers.IO) {
+        db.pedalDao().deleteAllSessions()
     }
 }

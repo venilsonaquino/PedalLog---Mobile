@@ -26,7 +26,13 @@ interface PedalDao {
     @Query("SELECT * FROM points WHERE sessionId = (SELECT id FROM sessions WHERE syncUuid = :syncUuid) ORDER BY timestamp ASC")
     fun getPointsForSession(syncUuid: String): Flow<List<PointEntity>>
 
+    @Query("SELECT * FROM points WHERE sessionId = :sessionId ORDER BY timestamp ASC")
+    fun getPointsBySessionId(sessionId: Long): Flow<List<PointEntity>>
+
     @Query("DELETE FROM sessions WHERE syncUuid = :syncUuid")
     fun deleteSession(syncUuid: String)
+
+    @Query("DELETE FROM sessions")
+    fun deleteAllSessions()
 
 }
