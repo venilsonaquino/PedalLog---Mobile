@@ -1,11 +1,38 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.PedalLogMobile" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/emerald_green</item>
-        <item name="colorSecondary">@color/emerald_green_dark</item>
-        <item name="android:windowBackground">@color/bg_dark</item>
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <!-- Color Palette -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+        
+        <item name="colorSecondary">@color/on_surface_variant</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:windowBackground">@color/background</item>
+        
+        <item name="android:textColorPrimary">@color/on_background</item>
+        <item name="android:textColorSecondary">@color/on_surface_variant</item>
+        
+        <!-- Typography -->
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+
+        <!-- Components -->
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 
     <style name="Theme.PedalLogMobile" parent="Base.Theme.PedalLogMobile" />
+
+    <style name="CustomBottomSheetDialog" parent="Theme.Material3.Dark.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="backgroundTint">@color/surface_container</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
+    </style>
+
+    <style name="ShapeAppearance.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">24dp</item>
+    </style>
 </resources>

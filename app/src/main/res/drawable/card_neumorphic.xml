@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dark Shadow (Bottom Right) -->
+    <item android:top="2dp" android:left="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#33000000" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Light Highlight (Top Left) -->
+    <item android:bottom="2dp" android:right="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#0DFFFFFF" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Base Surface -->
+    <item android:bottom="1dp" android:right="1dp" android:top="1dp" android:left="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#1A1A1A" />
+            <corners android:radius="20dp" />
+            <stroke android:width="0.5dp" android:color="#1AFFFFFF" />
+        </shape>
+    </item>
+</layer-list>

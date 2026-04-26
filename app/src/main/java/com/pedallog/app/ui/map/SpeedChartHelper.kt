@@ -18,12 +18,12 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 object SpeedChartHelper {
 
-    private val EMERALD       = Color.parseColor("#2ECC71")
-    private val EMERALD_ALPHA = Color.parseColor("#552ECC71")
+    private val EMERALD       = Color.parseColor("#54E98A")
+    private val EMERALD_ALPHA = Color.parseColor("#3354E98A")
     private val HIGHLIGHT_CLR = Color.parseColor("#80FFFFFF")
-    private val GRID_COLOR    = Color.parseColor("#1e293b")
-    private val AXIS_TEXT     = Color.parseColor("#94a3b8")
-    private val BG            = Color.parseColor("#141422")
+    private val GRID_COLOR    = Color.parseColor("#1AFFFFFF") // Subtle grid
+    private val AXIS_TEXT     = Color.parseColor("#BBCBBB")
+    private val BG            = Color.parseColor("#201F1F")
 
     /**
      * Configures the chart and wires the value-selected listener.

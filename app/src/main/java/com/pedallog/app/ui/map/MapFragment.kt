@@ -1,6 +1,8 @@
 package com.pedallog.app.ui.map
 
 import android.annotation.SuppressLint
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -9,6 +11,8 @@ import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -16,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.pedallog.app.R
 import com.pedallog.app.databinding.FragmentMapBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -149,8 +154,29 @@ class MapFragment : Fragment() {
         binding.tvMetricMaxSpeed.text  = String.format(Locale.US, "%.1f km/h", details.maxSpeedKmH)
         binding.tvMetricPoints.text    = details.gpsPointsCount.toString()
 
+        // Apply Skeuomorphic Gradients (programmatic for precision)
+        applyTextGradient(binding.tvMetricDistance, R.color.primary, R.color.on_primary_container)
+        applyTextGradient(binding.tvMetricMaxSpeed, R.color.on_background, R.color.on_surface_variant)
+        applyTextGradient(binding.tvMetricAvgSpeed, R.color.on_background, R.color.on_surface_variant)
+
         // Item 1+2+3: Chart with live WebView reference for map sync
         SpeedChartHelper.setup(binding.speedChart, details.trackPoints, binding.webView)
+    }
+
+    private fun applyTextGradient(textView: TextView, startColorRes: Int, endColorRes: Int) {
+        textView.post {
+            val paint = textView.paint
+            val width = paint.measureText(textView.text.toString())
+            val textShader: Shader = LinearGradient(
+                0f, 0f, 0f, textView.textSize,
+                intArrayOf(
+                    ContextCompat.getColor(requireContext(), startColorRes),
+                    ContextCompat.getColor(requireContext(), endColorRes)
+                ), null, Shader.TileMode.CLAMP
+            )
+            textView.paint.shader = textShader
+            textView.invalidate()
+        }
     }
 
     private fun updateMap(details: SessionMetrics) {

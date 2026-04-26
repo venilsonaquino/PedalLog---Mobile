@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#1A2ECC71" /> <!-- 10% opacity of emerald green -->
-    <corners android:radius="16dp" />
-    <stroke android:width="1dp" android:color="@color/emerald_green_dark" />
+    <!-- Low opacity primary green background -->
+    <solid android:color="#1A54E98A" />
+    <corners android:radius="8dp" />
+    <stroke android:width="1dp" android:color="@color/outline" />
 </shape>
