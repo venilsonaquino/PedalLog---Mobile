@@ -12,5 +12,6 @@ data class SessionEntity(
     val distanceKm: Double,
     val averageSpeed: Float,
     val totalAscent: Double,
-    val totalDescent: Double
+    val totalDescent: Double,
+    val activeDurationMs: Long = 0
 )

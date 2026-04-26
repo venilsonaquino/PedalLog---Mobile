@@ -53,6 +53,7 @@ class PedalSyncListenerService : WearableListenerService() {
                 val startTime = dataMap.getLong("start_time")
                 val endTime = dataMap.getLong("end_time")
                 val totalDistance = dataMap.getFloat("total_distance")
+                val activeDurationMs = dataMap.getLong("active_duration_ms")
                 val pointsGzip = dataMap.getByteArray("points_gz")
                 
                 if (syncUuid != null && pointsGzip != null) {
@@ -63,17 +64,22 @@ class PedalSyncListenerService : WearableListenerService() {
                                 (totalDistance / durationSec).toFloat()
                             } else 0f
 
+                            val points = GzipCsvUtils.decompressAndParsePoints(pointsGzip)
+                            
+                            // Correção de Timestamps baseada nos pontos reais do GPS
+                            val realStartTime = if (points.isNotEmpty()) points.first().timestamp else startTime
+                            val realEndTime = if (points.isNotEmpty()) points.last().timestamp else endTime
+
                             val session = com.pedallog.app.domain.model.PedalSession(
                                 syncUuid = syncUuid,
-                                startTime = startTime,
-                                endTime = endTime,
+                                startTime = realStartTime,
+                                endTime = realEndTime,
                                 distanceKm = totalDistance.toDouble(),
                                 averageSpeed = avgSpeed,
                                 totalAscent = 0.0,
-                                totalDescent = 0.0
+                                totalDescent = 0.0,
+                                activeDurationMs = activeDurationMs
                             )
-                            
-                            val points = GzipCsvUtils.decompressAndParsePoints(pointsGzip)
                             
                             saveSyncedPedalUseCase(session, points)
                             Log.d("SyncService", "Sessão $syncUuid sincronizada com ${points.size} pontos.")

@@ -14,7 +14,8 @@ object PedalMapper {
             distanceKm = entity.distanceKm,
             averageSpeed = entity.averageSpeed,
             totalAscent = entity.totalAscent,
-            totalDescent = entity.totalDescent
+            totalDescent = entity.totalDescent,
+            activeDurationMs = entity.activeDurationMs
         )
     }
 
@@ -26,7 +27,8 @@ object PedalMapper {
             distanceKm = domain.distanceKm,
             averageSpeed = domain.averageSpeed,
             totalAscent = domain.totalAscent,
-            totalDescent = domain.totalDescent
+            totalDescent = domain.totalDescent,
+            activeDurationMs = domain.activeDurationMs
         )
     }
 

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.pedallog.app.data.model.PointEntity
 import com.pedallog.app.data.model.SessionEntity
 
-@Database(entities = [SessionEntity::class, PointEntity::class], version = 1, exportSchema = false)
+@Database(entities = [SessionEntity::class, PointEntity::class], version = 2, exportSchema = false)
 @androidx.room.TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun pedalDao(): PedalDao
@@ -22,7 +22,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "pedal_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }
