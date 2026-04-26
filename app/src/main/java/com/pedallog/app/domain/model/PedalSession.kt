@@ -31,11 +31,13 @@ data class PedalSession(
 
     fun calculateMaxSpeedKmH(points: List<PedalPoint>): Float {
         if (points.isEmpty()) return 0f
-        return points.maxOf { it.speed } * 3.6f
+        // speed já vem em km/h do WearOS — sem conversão adicional
+        return points.maxOf { it.speed }
     }
 
     fun calculateAverageSpeedKmH(points: List<PedalPoint>): Float {
         if (points.isEmpty()) return 0f
-        return points.map { it.speed }.average().toFloat() * 3.6f
+        // speed já vem em km/h do WearOS — sem conversão adicional
+        return points.map { it.speed }.average().toFloat()
     }
 }
