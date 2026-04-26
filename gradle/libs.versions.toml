@@ -16,6 +16,7 @@ coroutines = "1.9.0"
 gson = "2.11.0"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.28"
+mpandroidchart = "v3.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,9 @@ kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "ko
 
 # Gson
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+# MPAndroidChart
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

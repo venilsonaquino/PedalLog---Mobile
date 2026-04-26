@@ -60,6 +60,9 @@ dependencies {
     
     // Gson
     implementation(libs.gson)
+
+    // MPAndroidChart
+    implementation(libs.mpandroidchart)
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

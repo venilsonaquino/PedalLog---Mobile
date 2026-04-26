@@ -114,7 +114,16 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
+            val sessionStartTime = session.startTime
             val geoJson = if (points.isNotEmpty()) getGeoJsonPathUseCase.invoke(points) else null
+            val trackPoints = points.map { pt ->
+                TrackPoint(
+                    lat = pt.latitude,
+                    lng = pt.longitude,
+                    speedKmH = pt.speed,
+                    timeOffsetMs = pt.timestamp - sessionStartTime
+                )
+            }
             
             _currentSessionDetails.value = SessionMetrics(
                 session = session,
@@ -123,7 +132,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 maxSpeedKmH = session.calculateMaxSpeedKmH(points),
                 avgSpeedKmH = session.calculateAverageSpeedKmH(points),
                 formattedDuration = session.getFormattedDuration(),
-                formattedDistance = session.getFormattedDistance()
+                formattedDistance = session.getFormattedDistance(),
+                trackPoints = trackPoints
             )
         }
     }
@@ -192,6 +202,13 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     }
 }
 
+data class TrackPoint(
+    val lat: Double,
+    val lng: Double,
+    val speedKmH: Float,
+    val timeOffsetMs: Long
+)
+
 data class SessionMetrics(
     val session: PedalSession,
     val geoJson: String?,
@@ -199,7 +216,8 @@ data class SessionMetrics(
     val maxSpeedKmH: Float,
     val avgSpeedKmH: Float,
     val formattedDuration: String,
-    val formattedDistance: String
+    val formattedDistance: String,
+    val trackPoints: List<TrackPoint> = emptyList()
 )
 
 sealed class UiEvent {

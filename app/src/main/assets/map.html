@@ -83,15 +83,16 @@
             height: 40px;
         }
 
-        /* Focus / GPS button — emerald accent */
+        /* Focus / GPS button — white for contrast against emerald route line */
         #btn-focus {
             border-radius: 10px;
             width: 40px;
             height: 40px;
-            background: rgba(16, 185, 129, 0.88);
-            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #10b981;   /* emerald icon */
         }
-        #btn-focus:hover { background: rgba(16, 185, 129, 1); }
+        #btn-focus:hover { background: rgba(255, 255, 255, 1); }
 
         /* Layers dropdown panel */
         #layers-panel {
@@ -244,6 +245,33 @@
         var currentLayer = null;
         var mapReady = false;
         var pendingGeoJson = null;
+        var trackPoints = [];   // [{lat, lng, spd}] for speed popup
+
+        // ── Popup style ──────────────────────────────────────────────────────
+        var speedPopup = L.popup({
+            className: 'speed-popup',
+            closeButton: false,
+            offset: [0, -4]
+        });
+
+        // Inject custom popup CSS
+        var style = document.createElement('style');
+        style.textContent = [
+            '.speed-popup .leaflet-popup-content-wrapper {',
+            '  background: rgba(15,15,25,0.92);',
+            '  border: 1px solid rgba(46,204,113,0.4);',
+            '  border-radius: 8px;',
+            '  color: #2ECC71;',
+            '  font-family: monospace;',
+            '  font-size: 14px;',
+            '  font-weight: bold;',
+            '  padding: 0;',
+            '  box-shadow: 0 2px 12px rgba(0,0,0,0.5);',
+            '}',
+            '.speed-popup .leaflet-popup-content { margin: 7px 12px; }',
+            '.speed-popup .leaflet-popup-tip { background: rgba(15,15,25,0.92); }'
+        ].join('');
+        document.head.appendChild(style);
 
         // Signal Android when JS engine is ready
         map.whenReady(function() {
@@ -263,6 +291,11 @@
                 return;
             }
             _drawTrackInternal(geoJsonString);
+        }
+
+        // Receives [{"lat":x,"lng":y,"spd":z}] for popup
+        function drawPoints(pointsJson) {
+            try { trackPoints = JSON.parse(pointsJson); } catch(e) {}
         }
 
         function invalidateAndFocus() {
@@ -285,16 +318,26 @@
                 currentLayer = L.geoJSON(geoJsonData, {
                     style: function () {
                         return {
-                            color: '#10b981',   // emerald
+                            color: '#10b981',
                             weight: 4,
                             opacity: 0.92,
                             lineJoin: 'round',
                             lineCap: 'round'
                         };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        layer.on('click', function(e) {
+                            var nearest = _findNearest(e.latlng);
+                            if (nearest) {
+                                speedPopup
+                                    .setLatLng(e.latlng)
+                                    .setContent(nearest.spd.toFixed(1) + ' km/h')
+                                    .openOn(map);
+                            }
+                        });
                     }
                 }).addTo(map);
 
-                // Force recalculate size then fit
                 map.invalidateSize({ animate: false });
                 map.fitBounds(currentLayer.getBounds(), { padding: [24, 24], animate: true });
 
@@ -304,6 +347,16 @@
                 console.error('Error parsing GeoJSON:', e);
                 if (window.Android) window.Android.onError(e.toString());
             }
+        }
+
+        function _findNearest(latlng) {
+            if (trackPoints.length === 0) return null;
+            var minD = Infinity, nearest = null;
+            for (var i = 0; i < trackPoints.length; i++) {
+                var d = map.distance(latlng, L.latLng(trackPoints[i].lat, trackPoints[i].lng));
+                if (d < minD) { minD = d; nearest = trackPoints[i]; }
+            }
+            return nearest;
         }
 
         // ── Layer switcher ──────────────────────────────────────────────────
