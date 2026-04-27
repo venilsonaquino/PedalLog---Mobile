@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pedallog.app.databinding.ItemSessionBinding
 import com.pedallog.app.domain.model.PedalSession
+import com.pedallog.app.domain.model.SessionFormatter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,7 +63,7 @@ class SessionAdapter(
             binding.tvSessionTitle.text = "Sessão de Ciclismo" // Placeholder for name
             
             binding.tvDistance.text = String.format(Locale.US, "%.1f km", session.distanceKm)
-            binding.tvDuration.text = session.getFormattedDuration()
+            binding.tvDuration.text = SessionFormatter.formatDuration(session.durationMs)
             binding.tvUuid.text = "UUID · ${session.syncUuid}"
         }
     }

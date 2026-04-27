@@ -27,6 +27,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.pedallog.app.utils.AnimationModule
 import com.pedallog.app.utils.GpxUtils
+import com.pedallog.app.domain.model.SessionFormatter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -133,8 +134,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 gpsPointsCount = points.size,
                 maxSpeedKmH = session.calculateMaxSpeedKmH(points),
                 avgSpeedKmH = session.calculateAverageSpeedKmH(points),
-                formattedDuration = session.getFormattedDuration(),
-                formattedDistance = session.getFormattedDistance(),
+                formattedDuration = SessionFormatter.formatDuration(session.durationMs),
+                formattedDistance = SessionFormatter.formatDistance(session.distanceKm),
                 trackPoints = trackPoints
             )
         }

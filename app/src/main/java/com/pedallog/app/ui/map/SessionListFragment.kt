@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import android.content.Intent
 import com.pedallog.app.R
 import com.pedallog.app.databinding.FragmentSessionListBinding
+import com.pedallog.app.domain.model.SessionFormatter
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -64,7 +65,7 @@ class SessionListFragment : Fragment() {
                 val intent = Intent(requireContext(), ShareActivity::class.java).apply {
                     putExtra("SYNC_UUID", session.syncUuid)
                     putExtra("DISTANCE", String.format(Locale.US, "%.2f km", session.distanceKm))
-                    putExtra("DURATION", session.getFormattedDuration())
+                    putExtra("DURATION", SessionFormatter.formatDuration(session.durationMs))
                     putExtra("ELEVATION", String.format(Locale.US, "%.0f m", session.totalAscent))
                 }
                 startActivity(intent)
