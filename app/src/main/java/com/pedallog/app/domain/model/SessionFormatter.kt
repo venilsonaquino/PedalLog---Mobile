@@ -26,4 +26,9 @@ object SessionFormatter {
     fun formatDistance(distanceKm: Double): String {
         return String.format(Locale.US, "%.2f km", distanceKm)
     }
+
+    fun formatDate(startTime: Long): String {
+        val dateFormat = java.text.SimpleDateFormat("MMM dd, yyyy", Locale("pt", "BR"))
+        return dateFormat.format(java.util.Date(startTime))
+    }
 }

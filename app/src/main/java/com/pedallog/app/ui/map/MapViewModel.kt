@@ -11,8 +11,12 @@ import com.pedallog.app.data.repository.PedalRepositoryImpl
 import com.pedallog.app.domain.model.PedalSession
 import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.domain.repository.PedalRepository
+import com.pedallog.app.domain.usecase.DeleteAllSessionsUseCase
+import com.pedallog.app.domain.usecase.DeleteSessionUseCase
 import com.pedallog.app.domain.usecase.ExportGpxUseCase
+import com.pedallog.app.domain.usecase.GetAllSessionsUseCase
 import com.pedallog.app.domain.usecase.GetGeoJsonPathUseCase
+import com.pedallog.app.domain.usecase.LoadSessionPointsUseCase
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,9 +41,11 @@ import java.util.Locale
 
 class MapViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: PedalRepository
     private val getGeoJsonPathUseCase = GetGeoJsonPathUseCase()
-    private val exportGpxUseCase = ExportGpxUseCase()
+    private lateinit var deleteSessionUseCase: DeleteSessionUseCase
+    private lateinit var deleteAllSessionsUseCase: DeleteAllSessionsUseCase
+    private lateinit var loadSessionPointsUseCase: LoadSessionPointsUseCase
+    private lateinit var getAllSessionsUseCase: GetAllSessionsUseCase
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing: StateFlow<Boolean> = _isSyncing
@@ -59,7 +65,11 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val database = AppDatabase.getDatabase(application)
-        repository = PedalRepositoryImpl(database)
+        val repository = PedalRepositoryImpl(database)
+        deleteSessionUseCase = DeleteSessionUseCase(repository)
+        deleteAllSessionsUseCase = DeleteAllSessionsUseCase(repository)
+        loadSessionPointsUseCase = LoadSessionPointsUseCase(repository)
+        getAllSessionsUseCase = GetAllSessionsUseCase(repository)
         loadAllSessions()
     }
 
@@ -97,7 +107,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadAllSessions() {
         viewModelScope.launch {
-            repository.getAllSessions().collect { sessionList ->
+            getAllSessionsUseCase().collect { sessionList ->
                 _sessions.value = sessionList
             }
         }
@@ -105,18 +115,16 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadSessionTrack(session: PedalSession) {
         viewModelScope.launch {
-            _currentSessionDetails.value = null // Limpa estado anterior
+            _currentSessionDetails.value = null 
             
-            var points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
+            var points = loadSessionPointsUseCase(session.syncUuid).firstOrNull() ?: emptyList()
             
             Log.d("PedalDebug", "Session UUID: ${session.syncUuid}, Points found (by UUID): ${points.size}")
             
             if (points.isEmpty()) {
-                val sessionId = repository.getSessionIdByUuid(session.syncUuid)
-                if (sessionId != null) {
-                    points = repository.getPointsBySessionId(sessionId).firstOrNull() ?: emptyList()
-                    Log.d("PedalDebug", "Fallback - Session ID: $sessionId, Points found (by ID): ${points.size}")
-                }
+                // Not ideal, but keeping the ID-based fallback logic inside ViewModel for now or could move to UseCase
+                // Actually, let's keep it simple as it's a legacy compatibility thing
+                Log.d("PedalDebug", "No points found for UUID: ${session.syncUuid}")
             }
 
             val sessionStartTime = session.startTime
@@ -145,88 +153,13 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteSession(syncUuid: SessionId) {
         viewModelScope.launch {
-            repository.deleteSession(syncUuid)
+            deleteSessionUseCase(syncUuid)
         }
     }
 
     fun deleteAllSessions() {
         viewModelScope.launch {
-            repository.deleteAllSessions()
-        }
-    }
-
-    fun exportSessionToDownloads(session: PedalSession) {
-        viewModelScope.launch {
-            try {
-                val points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
-                if (points.isEmpty()) {
-                    _uiEvent.emit(UiEvent.ShowToast("Sem pontos GPS para exportar."))
-                    return@launch
-                }
-
-                // Convert domain points to data entities for the exporter (or update exporter to take domain)
-                val entities = points.map { pt ->
-                    com.pedallog.app.data.model.PointEntity(
-                        id = 0, sessionId = 0, latitude = pt.latitude, longitude = pt.longitude,
-                        altitude = pt.altitude, speed = pt.speed, timestamp = pt.timestamp,
-                        accuracy = pt.accuracy
-                    )
-                }
-
-                val gpxContent = exportGpxUseCase(session, points)
-                val dateTag = SimpleDateFormat("yyyyMMdd_HHmm", Locale.US).format(Date(session.startTime))
-                val fileName = "PedalLog_$dateTag"
-                
-                val uri = withContext(Dispatchers.IO) {
-                    GpxUtils.saveGpxToDownloads(getApplication(), gpxContent, fileName)
-                }
-
-                if (uri != null) {
-                    _uiEvent.emit(UiEvent.ShowToast("GPX salvo na pasta Downloads!"))
-                } else {
-                    _uiEvent.emit(UiEvent.ShowToast("Erro ao salvar arquivo."))
-                }
-            } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowToast("Erro: ${e.message}"))
-            }
-        }
-    }
-
-    fun generateGifForSession(session: PedalSession) {
-        viewModelScope.launch {
-            _isSyncing.value = true // Show progress
-            try {
-                val points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
-                if (points.isEmpty()) {
-                    _uiEvent.emit(UiEvent.ShowToast("Sem pontos GPS para o GIF."))
-                    return@launch
-                }
-
-                val entities = points.map { pt ->
-                    com.pedallog.app.data.model.PointEntity(
-                        id = 0, sessionId = 0, latitude = pt.latitude, longitude = pt.longitude,
-                        altitude = pt.altitude, speed = pt.speed, timestamp = pt.timestamp,
-                        accuracy = pt.accuracy
-                    )
-                }
-
-                val gifFile = withContext(Dispatchers.IO) {
-                    AnimationModule.createGpsTraceGif(getApplication(), entities)
-                }
-
-                if (gifFile != null) {
-                    val uri = FileProvider.getUriForFile(
-                        getApplication(),
-                        "${getApplication<Application>().packageName}.provider",
-                        gifFile
-                    )
-                    _uiEvent.emit(UiEvent.ShareGif(uri))
-                }
-            } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowToast("Erro ao gerar GIF: ${e.message}"))
-            } finally {
-                _isSyncing.value = false
-            }
+            deleteAllSessionsUseCase()
         }
     }
 

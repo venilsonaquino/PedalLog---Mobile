@@ -18,11 +18,10 @@ import com.pedallog.app.domain.model.PedalPoint
 import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.repository.PedalRepositoryImpl
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
+import com.pedallog.app.domain.usecase.LoadSessionPointsUseCase
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
@@ -30,6 +29,7 @@ import java.util.Locale
 class ShareActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityShareBinding
+    private lateinit var viewModel: ExportViewModel
     private var syncUuid: SessionId? = null
     private var points: List<PedalPoint> = emptyList()
 
@@ -43,8 +43,24 @@ class ShareActivity : AppCompatActivity() {
         val duration = intent.getStringExtra("DURATION") ?: "00:00:00"
         val elev = intent.getStringExtra("ELEVATION") ?: "0 m"
 
+        setupViewModel()
         setupUI(distance, duration, elev)
         loadDataAndSetupAdapter(distance, duration, elev)
+    }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(this)[ExportViewModel::class.java]
+        val database = AppDatabase.getDatabase(application)
+        val repository = PedalRepositoryImpl(database)
+        viewModel.init(LoadSessionPointsUseCase(repository))
+
+        lifecycleScope.launch {
+            viewModel.uiEvent.collect { event ->
+                if (event is UiEvent.ShowToast) {
+                    Toast.makeText(this@ShareActivity, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun setupUI(distance: String, duration: String, elev: String) {
@@ -71,15 +87,10 @@ class ShareActivity : AppCompatActivity() {
 
     private fun loadDataAndSetupAdapter(dist: String, dur: String, el: String) {
         val uuid = syncUuid ?: return
-        val database = AppDatabase.getDatabase(application)
-        val repository = PedalRepositoryImpl(database)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            points = repository.getPointsForSession(uuid).firstOrNull() ?: emptyList()
-            withContext(Dispatchers.Main) {
-                val adapter = ShareCardAdapter(points, dist, dur, el)
-                binding.viewPagerStyles.adapter = adapter
-            }
+        lifecycleScope.launch {
+            points = viewModel.getPointsForSession(uuid)
+            val adapter = ShareCardAdapter(points, dist, dur, el)
+            binding.viewPagerStyles.adapter = adapter
         }
     }
 

@@ -24,6 +24,7 @@ class SessionListFragment : Fragment() {
 
     // Use activityViewModels to share data with MapFragment
     private val viewModel: MapViewModel by activityViewModels()
+    private val exportViewModel: ExportViewModel by activityViewModels()
 
     private lateinit var sessionAdapter: SessionAdapter
 
@@ -40,7 +41,14 @@ class SessionListFragment : Fragment() {
 
         setupRecyclerView()
         setupSyncButton()
+        setupExportViewModel()
         observeViewModel()
+    }
+
+    private fun setupExportViewModel() {
+        val database = com.pedallog.app.data.db.AppDatabase.getDatabase(requireContext())
+        val repository = com.pedallog.app.data.repository.PedalRepositoryImpl(database)
+        exportViewModel.init(com.pedallog.app.domain.usecase.LoadSessionPointsUseCase(repository))
     }
 
     private fun setupSyncButton() {
@@ -59,7 +67,7 @@ class SessionListFragment : Fragment() {
                 viewModel.deleteSession(session.syncUuid)
             },
             onDownloadGpx = { session ->
-                viewModel.exportSessionToDownloads(session)
+                exportViewModel.exportSessionToDownloads(session)
             },
             onShareGif = { session ->
                 val intent = Intent(requireContext(), ShareActivity::class.java).apply {
@@ -99,25 +107,35 @@ class SessionListFragment : Fragment() {
                 }
 
                 launch {
-                    viewModel.uiEvent.collect { event ->
-                        when (event) {
-                            is UiEvent.ShowToast -> {
-                                android.widget.Toast.makeText(requireContext(), event.message, android.widget.Toast.LENGTH_SHORT).show()
-                            }
-                            is UiEvent.ShareGpx -> {
-                                // GPX sharing is handled by MapFragment — no-op here
-                            }
-                            is UiEvent.ShareGif -> {
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "image/gif"
-                                    putExtra(Intent.EXTRA_STREAM, event.uri)
-                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                }
-                                startActivity(Intent.createChooser(intent, "Compartilhar GIF da Rota"))
-                            }
-                        }
+                    exportViewModel.uiEvent.collect { event ->
+                        handleUiEvent(event)
                     }
                 }
+
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        handleUiEvent(event)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleUiEvent(event: UiEvent) {
+        when (event) {
+            is UiEvent.ShowToast -> {
+                android.widget.Toast.makeText(requireContext(), event.message, android.widget.Toast.LENGTH_SHORT).show()
+            }
+            is UiEvent.ShareGpx -> {
+                // Shared if needed
+            }
+            is UiEvent.ShareGif -> {
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "image/gif"
+                    putExtra(Intent.EXTRA_STREAM, event.uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                startActivity(Intent.createChooser(intent, "Compartilhar GIF da Rota"))
             }
         }
     }

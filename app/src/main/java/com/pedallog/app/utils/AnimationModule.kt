@@ -1,102 +1,42 @@
 package com.pedallog.app.utils
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
-import android.net.Uri
-import androidx.core.content.FileProvider
-import com.pedallog.app.data.model.PointEntity
+import com.pedallog.app.domain.model.PedalPoint
 import java.io.File
 import java.io.FileOutputStream
 
+/**
+ * Módulo para geração de animações (GIF) a partir de pontos GPS.
+ * SRP: Orquestra a criação do arquivo GIF usando o TracePainter.
+ */
 object AnimationModule {
     
-    fun createGpsTraceGif(context: Context, points: List<PointEntity>): File? {
+    private const val GIF_WIDTH = 400
+    private const val GIF_HEIGHT = 400
+    private const val PADDING = 40f
+    private const val TARGET_FRAMES = 40
+    private const val FRAME_DELAY_MS = 50
+
+    fun createGpsTraceGif(context: Context, points: List<PedalPoint>): File? {
         if (points.isEmpty()) return null
         
-        val width = 400
-        val height = 400
-        val padding = 40f
-        
-        // Find bounds
-        val minLat = points.minOf { it.latitude }
-        val maxLat = points.maxOf { it.latitude }
-        val minLon = points.minOf { it.longitude }
-        val maxLon = points.maxOf { it.longitude }
-        
-        val latRange = maxLat - minLat
-        val lonRange = maxLon - minLon
-        val scale = Math.min((width - 2 * padding) / lonRange, (height - 2 * padding) / latRange)
-        
-        fun getX(lon: Double) = (padding + (lon - minLon) * scale).toFloat()
-        fun getY(lat: Double) = (height - (padding + (lat - minLat) * scale)).toFloat()
-        
         val gifFile = File(context.cacheDir, "trace_animation.gif")
-        val encoder = GifEncoder()
-        encoder.start(FileOutputStream(gifFile))
-        encoder.setSize(width, height)
-        encoder.setDelay(50) // 20 fps approx
-        
-        val paintTrace = Paint().apply {
-            color = Color.parseColor("#333333")
-            strokeWidth = 4f
-            style = Paint.Style.STROKE
-            isAntiAlias = true
-            strokeJoin = Paint.Join.ROUND
-            strokeCap = Paint.Cap.ROUND
+        val encoder = GifEncoder().apply {
+            start(FileOutputStream(gifFile))
+            setSize(GIF_WIDTH, GIF_HEIGHT)
+            setDelay(FRAME_DELAY_MS)
         }
         
-        val paintMarker = Paint().apply {
-            color = Color.parseColor("#54e98a") // Esmeralda
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
+        val mapper = CoordinateMapper(GIF_WIDTH, GIF_HEIGHT, PADDING, points)
+        val painter = TracePainter(GIF_WIDTH, GIF_HEIGHT, mapper)
+        val frameStep = Math.max(1, points.size / TARGET_FRAMES)
         
-        val paintGlow = Paint().apply {
-            color = Color.parseColor("#54e98a")
-            alpha = 100
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
-
-        // Generate frames (decimate points if too many for GIF)
-        val frameStep = Math.max(1, points.size / 40) // Target ~40 frames
-        
-        for (i in 0 until points.size step frameStep) {
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            canvas.drawColor(Color.TRANSPARENT)
-            
-            // Draw full path up to point i
-            val path = Path()
-            path.moveTo(getX(points[0].longitude), getY(points[0].latitude))
-            for (j in 1..i) {
-                path.lineTo(getX(points[j].longitude), getY(points[j].latitude))
-            }
-            canvas.drawPath(path, paintTrace)
-            
-            // Draw marker at current point
-            val cx = getX(points[i].longitude)
-            val cy = getY(points[i].latitude)
-            canvas.drawCircle(cx, cy, 8f, paintGlow)
-            canvas.drawCircle(cx, cy, 4f, paintMarker)
-            
+        for (i in points.indices step frameStep) {
+            val bitmap = painter.drawFrame(points, i)
             encoder.addFrame(bitmap)
         }
         
         encoder.finish()
         return gifFile
-    }
-
-    fun getShareIntent(context: Context, file: File): android.content.Intent {
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        return android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-            type = "image/gif"
-            putExtra(android.content.Intent.EXTRA_STREAM, uri)
-            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
     }
 }
