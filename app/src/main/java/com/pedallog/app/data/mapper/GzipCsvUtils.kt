@@ -11,19 +11,7 @@ import java.io.BufferedReader
 object GzipCsvUtils {
 
     fun decompressAndParsePoints(compressedData: ByteArray): List<PedalPoint> {
-        val decompressedString = try {
-            val bais = ByteArrayInputStream(compressedData)
-            val gzipIn = GZIPInputStream(bais)
-            val reader = BufferedReader(InputStreamReader(gzipIn, "UTF-8"))
-            val text = reader.readText()
-            reader.close()
-            gzipIn.close()
-            text
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ""
-        }
-
+        val decompressedString = decompress(compressedData)
         return parsePointsCsvOnly(decompressedString)
     }
 
@@ -51,20 +39,23 @@ object GzipCsvUtils {
     }
 
     fun decompressAndParse(compressedData: ByteArray): Pair<PedalSession, List<PedalPoint>> {
-        val decompressedString = try {
-            val bais = ByteArrayInputStream(compressedData)
-            val gzipIn = GZIPInputStream(bais)
-            val reader = BufferedReader(InputStreamReader(gzipIn, "UTF-8"))
+        val decompressedString = decompress(compressedData)
+        return parseCsv(decompressedString)
+    }
+
+    private fun decompress(compressedData: ByteArray): String {
+        return try {
+            val byteArrayInputStream = ByteArrayInputStream(compressedData)
+            val gzipInputStream = GZIPInputStream(byteArrayInputStream)
+            val reader = BufferedReader(InputStreamReader(gzipInputStream, "UTF-8"))
             val text = reader.readText()
             reader.close()
-            gzipIn.close()
+            gzipInputStream.close()
             text
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (exception: Exception) {
+            exception.printStackTrace()
             ""
         }
-
-        return parseCsv(decompressedString)
     }
 
     private fun parseCsv(csv: String): Pair<PedalSession, List<PedalPoint>> {
