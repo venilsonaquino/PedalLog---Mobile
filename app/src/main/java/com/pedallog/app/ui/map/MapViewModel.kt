@@ -28,6 +28,7 @@ import kotlinx.coroutines.withContext
 import com.pedallog.app.utils.AnimationModule
 import com.pedallog.app.utils.GpxUtils
 import com.pedallog.app.domain.model.SessionFormatter
+import com.pedallog.app.domain.model.SessionMetricsCalculator
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -132,8 +133,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 session = session,
                 geoJson = geoJson,
                 gpsPointsCount = points.size,
-                maxSpeedKmH = session.calculateMaxSpeedKmH(points),
-                avgSpeedKmH = session.calculateAverageSpeedKmH(points),
+                maxSpeedKmH = SessionMetricsCalculator.calculateMaxSpeedKmH(points),
+                avgSpeedKmH = SessionMetricsCalculator.calculateAverageSpeedKmH(points),
                 formattedDuration = SessionFormatter.formatDuration(session.durationMs),
                 formattedDistance = SessionFormatter.formatDistance(session.distanceKm),
                 trackPoints = trackPoints
