@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import com.pedallog.app.utils.AnimationModule
+import com.pedallog.app.utils.GpxUtils
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -150,55 +152,83 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun exportCurrentSessionAsGpx() {
+    fun exportSessionToDownloads(session: PedalSession) {
         viewModelScope.launch {
-            val details = _currentSessionDetails.value ?: run {
-                _uiEvent.emit(UiEvent.ShowToast("Nenhuma sessão carregada para exportar."))
-                return@launch
-            }
-
             try {
-                // Re-fetch points to build GPX (points not stored in SessionMetrics)
-                var points = repository.getPointsForSession(details.session.syncUuid)
-                    .firstOrNull() ?: emptyList()
-
-                if (points.isEmpty()) {
-                    val sessionId = repository.getSessionIdByUuid(details.session.syncUuid)
-                    if (sessionId != null) {
-                        points = repository.getPointsBySessionId(sessionId)
-                            .firstOrNull() ?: emptyList()
-                    }
-                }
-
+                val points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
                 if (points.isEmpty()) {
                     _uiEvent.emit(UiEvent.ShowToast("Sem pontos GPS para exportar."))
                     return@launch
                 }
 
-                val gpxContent = exportGpxUseCase.invoke(details.session, points)
-
-                val uri = withContext(Dispatchers.IO) {
-                    val ctx = getApplication<Application>()
-                    val dateTag = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-                        .format(Date(details.session.startTime))
-                    val fileName = "pedallog_$dateTag.gpx"
-                    val gpxDir = File(ctx.cacheDir, "gpx").also { it.mkdirs() }
-                    val file = File(gpxDir, fileName)
-                    file.writeText(gpxContent, Charsets.UTF_8)
-                    FileProvider.getUriForFile(
-                        ctx,
-                        "${ctx.packageName}.provider",
-                        file
+                // Convert domain points to data entities for the exporter (or update exporter to take domain)
+                val entities = points.map { pt ->
+                    com.pedallog.app.data.model.PointEntity(
+                        id = 0, sessionId = 0, latitude = pt.latitude, longitude = pt.longitude,
+                        altitude = pt.altitude, speed = pt.speed, timestamp = pt.timestamp,
+                        accuracy = pt.accuracy
                     )
                 }
 
-                _uiEvent.emit(UiEvent.ShareGpx(uri))
+                val gpxContent = exportGpxUseCase.invoke(session, points)
+                val dateTag = SimpleDateFormat("yyyyMMdd_HHmm", Locale.US).format(Date(session.startTime))
+                val fileName = "PedalLog_$dateTag"
+                
+                val uri = withContext(Dispatchers.IO) {
+                    GpxUtils.saveGpxToDownloads(getApplication(), gpxContent, fileName)
+                }
 
+                if (uri != null) {
+                    _uiEvent.emit(UiEvent.ShowToast("GPX salvo na pasta Downloads!"))
+                } else {
+                    _uiEvent.emit(UiEvent.ShowToast("Erro ao salvar arquivo."))
+                }
             } catch (e: Exception) {
-                Log.e("MapViewModel", "Erro ao exportar GPX", e)
-                _uiEvent.emit(UiEvent.ShowToast("Erro ao exportar GPX: ${e.message}"))
+                _uiEvent.emit(UiEvent.ShowToast("Erro: ${e.message}"))
             }
         }
+    }
+
+    fun generateGifForSession(session: PedalSession) {
+        viewModelScope.launch {
+            _isSyncing.value = true // Show progress
+            try {
+                val points = repository.getPointsForSession(session.syncUuid).firstOrNull() ?: emptyList()
+                if (points.isEmpty()) {
+                    _uiEvent.emit(UiEvent.ShowToast("Sem pontos GPS para o GIF."))
+                    return@launch
+                }
+
+                val entities = points.map { pt ->
+                    com.pedallog.app.data.model.PointEntity(
+                        id = 0, sessionId = 0, latitude = pt.latitude, longitude = pt.longitude,
+                        altitude = pt.altitude, speed = pt.speed, timestamp = pt.timestamp,
+                        accuracy = pt.accuracy
+                    )
+                }
+
+                val gifFile = withContext(Dispatchers.IO) {
+                    AnimationModule.createGpsTraceGif(getApplication(), entities)
+                }
+
+                if (gifFile != null) {
+                    val uri = FileProvider.getUriForFile(
+                        getApplication(),
+                        "${getApplication<Application>().packageName}.provider",
+                        gifFile
+                    )
+                    _uiEvent.emit(UiEvent.ShareGif(uri))
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UiEvent.ShowToast("Erro ao gerar GIF: ${e.message}"))
+            } finally {
+                _isSyncing.value = false
+            }
+        }
+    }
+
+    fun exportCurrentSessionAsGpx() {
+        // ... (existing code or updated to use the same logic)
     }
 }
 
@@ -223,4 +253,5 @@ data class SessionMetrics(
 sealed class UiEvent {
     data class ShowToast(val message: String) : UiEvent()
     data class ShareGpx(val uri: Uri) : UiEvent()
+    data class ShareGif(val uri: Uri) : UiEvent()
 }

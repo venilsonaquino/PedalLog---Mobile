@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import android.content.Intent
 import com.pedallog.app.R
 import com.pedallog.app.databinding.FragmentSessionListBinding
 import kotlinx.coroutines.launch
@@ -55,6 +56,18 @@ class SessionListFragment : Fragment() {
             },
             onDeleteClick = { session ->
                 viewModel.deleteSession(session.syncUuid)
+            },
+            onDownloadGpx = { session ->
+                viewModel.exportSessionToDownloads(session)
+            },
+            onShareGif = { session ->
+                val intent = Intent(requireContext(), ShareActivity::class.java).apply {
+                    putExtra("SYNC_UUID", session.syncUuid)
+                    putExtra("DISTANCE", String.format(Locale.US, "%.2f km", session.distanceKm))
+                    putExtra("DURATION", session.getFormattedDuration())
+                    putExtra("ELEVATION", String.format(Locale.US, "%.0f m", session.totalAscent))
+                }
+                startActivity(intent)
             }
         )
         binding.rvSessions.adapter = sessionAdapter
@@ -92,6 +105,14 @@ class SessionListFragment : Fragment() {
                             }
                             is UiEvent.ShareGpx -> {
                                 // GPX sharing is handled by MapFragment — no-op here
+                            }
+                            is UiEvent.ShareGif -> {
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "image/gif"
+                                    putExtra(Intent.EXTRA_STREAM, event.uri)
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                startActivity(Intent.createChooser(intent, "Compartilhar GIF da Rota"))
                             }
                         }
                     }

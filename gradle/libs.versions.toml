@@ -17,6 +17,7 @@ gson = "2.11.0"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.28"
 mpandroidchart = "v3.1.0"
+lottie = "6.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,6 +51,9 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # MPAndroidChart
 mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
+
+# Lottie
+lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

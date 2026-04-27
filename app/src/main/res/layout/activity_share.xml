@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F0F0F">
+
+    <!-- Header -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_close"
+        app:title="Compartilhar Atividade"
+        app:titleTextColor="@color/white" />
+
+    <!-- Preview ViewPager (Allows swiping between 3 styles) -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerStyles"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="32dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingHorizontal="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/llIndicators"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <!-- Indicators -->
+    <LinearLayout
+        android:id="@+id/llIndicators"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/tvShareTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <View android:id="@+id/indicator0" android:layout_width="6dp" android:layout_height="6dp" android:background="@drawable/indicator_active" />
+        <View android:id="@+id/indicator1" android:layout_width="6dp" android:layout_height="6dp" android:layout_marginStart="8dp" android:background="@drawable/indicator_inactive" />
+    </LinearLayout>
+
+    <!-- Share Actions -->
+    <TextView
+        android:id="@+id/tvShareTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="Compartilhar em"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/hsvActions"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/hsvActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- WhatsApp -->
+            <LinearLayout android:id="@+id/btnWhatsApp" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_whatsapp" android:padding="14dp" app:tint="#25D366" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="WhatsApp" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- Instagram -->
+            <LinearLayout android:id="@+id/btnInstagram" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_instagram" android:padding="14dp" app:tint="#E1306C" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Instagram" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- Download -->
+            <LinearLayout android:id="@+id/btnSaveImage" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_file_download" android:padding="16dp" app:tint="@color/white" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Baixar" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- More -->
+            <LinearLayout android:id="@+id/btnMore" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_share" android:padding="16dp" app:tint="@color/white" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mais" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

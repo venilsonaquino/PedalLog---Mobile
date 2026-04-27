@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shareCard"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F0F0F"
+    android:padding="0dp">
+
+    <!-- Background Pattern for Style 3 -->
+    <ImageView
+        android:id="@+id/ivFullBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:src="@drawable/top_bar_gradient"
+        android:alpha="0.2" />
+
+    <!-- Main Card Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/innerCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="4:5"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/card_share_bg"
+        android:padding="2dp">
+
+        <View
+            android:id="@+id/glowBorder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_glow_border"
+            android:alpha="0.4" />
+
+        <FrameLayout
+            android:id="@+id/previewContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <WebView
+                android:id="@+id/webViewMap"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <!-- Branding -->
+            <LinearLayout
+                android:id="@+id/llBranding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/ivBrandingBike"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_bike"
+                    app:tint="@color/primary" />
+                <TextView
+                    android:id="@+id/tvBrandingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="PEDAL LOG"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.2" />
+            </LinearLayout>
+
+            <!-- Metrics Overlay -->
+            <LinearLayout
+                android:id="@+id/llMetricsOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@drawable/gradient_shadow_bottom">
+
+                <TextView
+                    android:id="@+id/tvPreviewTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pedal Matinal"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:fontFamily="sans-serif-black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="bottom">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="32dp">
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                            <ImageView android:id="@+id/ivDistIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_route" app:tint="#B3FFFFFF" />
+                            <TextView android:id="@+id/tvDistLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" DISTÂNCIA" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                        </LinearLayout>
+                        <TextView android:id="@+id/tvPreviewDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.00 km" android:textColor="@color/white" android:textSize="22sp" android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                            <ImageView android:id="@+id/ivTimeIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_clock" app:tint="#B3FFFFFF" />
+                            <TextView android:id="@+id/tvTimeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" TEMPO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                        </LinearLayout>
+                        <TextView android:id="@+id/tvPreviewTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0h 0m" android:textColor="@color/white" android:textSize="18sp" android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llElevContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                        <ImageView android:id="@+id/ivElevIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_chart" app:tint="#B3FFFFFF" />
+                        <TextView android:id="@+id/tvElevLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ELEVAÇÃO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvPreviewElev" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 m" android:textColor="@color/white" android:textSize="18sp" android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Bottom info for Style 3 -->
+    <TextView
+        android:id="@+id/tvBottomCheckOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="Confira meu pedal no"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/ivBottomLogo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivBottomLogo"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="48dp"
+        android:src="@drawable/ic_bike"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/primary" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

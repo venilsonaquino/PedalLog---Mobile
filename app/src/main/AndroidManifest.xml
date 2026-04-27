@@ -23,6 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.map.ShareActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PedalLogMobile" />
         <service
             android:name=".service.PedalSyncListenerService"
             android:exported="true">
