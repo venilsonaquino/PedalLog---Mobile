@@ -2,6 +2,6 @@
 <paths>
     <!-- Cache dir used for temporary GPX exports -->
     <cache-path
-        name="gpx_exports"
-        path="gpx/" />
+        name="shared_files"
+        path="." />
 </paths>

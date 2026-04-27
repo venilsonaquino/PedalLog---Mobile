@@ -13,7 +13,9 @@ import java.util.Locale
 
 class SessionAdapter(
     private val onSessionClick: (PedalSession) -> Unit,
-    private val onDeleteClick: (PedalSession) -> Unit
+    private val onDeleteClick: (PedalSession) -> Unit,
+    private val onDownloadGpx: (PedalSession) -> Unit,
+    private val onShareGif: (PedalSession) -> Unit
 ) : ListAdapter<PedalSession, SessionAdapter.SessionViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
@@ -40,10 +42,16 @@ class SessionAdapter(
                 }
             }
             binding.btnShare.setOnClickListener {
-                // Implementation for SHARE
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onShareGif(getItem(position))
+                }
             }
             binding.btnDownload.setOnClickListener {
-                // Implementation for GPX Download
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onDownloadGpx(getItem(position))
+                }
             }
         }
 

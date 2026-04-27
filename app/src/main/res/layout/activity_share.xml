@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F0F0F">
+
+    <!-- Header -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_close"
+        app:title="Compartilhar Atividade"
+        app:titleTextColor="@color/white" />
+
+    <!-- Preview Container (High Fidelity Card) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/shareCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginVertical="32dp"
+        android:background="@drawable/card_share_bg"
+        android:padding="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/llIndicators"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_glow_border"
+            android:alpha="0.4" />
+
+        <FrameLayout
+            android:id="@+id/previewContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <!-- Branding Logo PT-BR -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_bike"
+                    app:tint="@color/primary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="PEDAL LOG"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.2" />
+            </LinearLayout>
+
+            <!-- Metrics Overlay PT-BR -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@drawable/gradient_shadow_bottom">
+
+                <TextView
+                    android:id="@+id/tvPreviewTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pedal Matinal"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:fontFamily="sans-serif-black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="bottom">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="32dp">
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                            <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_route" app:tint="#B3FFFFFF" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" DISTÂNCIA" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                        </LinearLayout>
+                        <TextView android:id="@+id/tvPreviewDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="27.13 km" android:textColor="@color/white" android:textSize="22sp" android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                            <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_clock" app:tint="#B3FFFFFF" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" TEMPO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                        </LinearLayout>
+                        <TextView android:id="@+id/tvPreviewTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1h 12m" android:textColor="@color/white" android:textSize="18sp" android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                        <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_chart" app:tint="#B3FFFFFF" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ELEVAÇÃO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvPreviewElev" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="203 m" android:textColor="@color/white" android:textSize="18sp" android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Indicators -->
+    <LinearLayout
+        android:id="@+id/llIndicators"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/tvShareTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <View android:layout_width="6dp" android:layout_height="6dp" android:background="@drawable/indicator_active" />
+        <View android:layout_width="6dp" android:layout_height="6dp" android:layout_marginStart="8dp" android:background="@drawable/indicator_inactive" />
+        <View android:layout_width="6dp" android:layout_height="6dp" android:layout_marginStart="8dp" android:background="@drawable/indicator_inactive" />
+    </LinearLayout>
+
+    <!-- Share Actions PT-BR -->
+    <TextView
+        android:id="@+id/tvShareTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="Compartilhar em"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/hsvActions"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/hsvActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- WhatsApp -->
+            <LinearLayout android:id="@+id/btnWhatsApp" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_whatsapp" android:padding="14dp" app:tint="#25D366" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="WhatsApp" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- Instagram -->
+            <LinearLayout android:id="@+id/btnInstagram" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_instagram" android:padding="14dp" app:tint="#E1306C" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Instagram" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- Download -->
+            <LinearLayout android:id="@+id/btnSaveImage" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_file_download" android:padding="16dp" app:tint="@color/white" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Baixar" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- More -->
+            <LinearLayout android:id="@+id/btnMore" android:layout_width="80dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/circle_dark" />
+                    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/ic_share" android:padding="16dp" app:tint="@color/white" />
+                </FrameLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mais" android:textColor="#B3FFFFFF" android:textSize="11sp" android:gravity="center" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
