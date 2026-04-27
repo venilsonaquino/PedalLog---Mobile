@@ -2,20 +2,16 @@ package com.pedallog.app.service
 
 import android.util.Log
 import com.pedallog.app.data.db.AppDatabase
-import com.pedallog.app.data.mapper.GzipCsvUtils
 import com.pedallog.app.data.repository.PedalRepositoryImpl
-import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.domain.usecase.SaveSyncedPedalUseCase
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
-import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class PedalSyncListenerService : WearableListenerService() {
 
