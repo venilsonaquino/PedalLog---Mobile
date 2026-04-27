@@ -13,6 +13,7 @@ import com.pedallog.app.R
 import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.mapper.GzipCsvUtils
 import com.pedallog.app.data.repository.PedalRepositoryImpl
+import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.domain.usecase.SaveSyncedPedalUseCase
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -71,7 +72,7 @@ class PedalSyncListenerService : WearableListenerService() {
                             val realEndTime = if (points.isNotEmpty()) points.last().timestamp else endTime
 
                             val session = com.pedallog.app.domain.model.PedalSession(
-                                syncUuid = syncUuid,
+                                syncUuid = SessionId(syncUuid),
                                 startTime = realStartTime,
                                 endTime = realEndTime,
                                 distanceKm = totalDistance.toDouble(),

@@ -3,7 +3,7 @@ package com.pedallog.app.domain.model
 import java.util.Locale
 
 data class PedalSession(
-    val syncUuid: String,
+    val syncUuid: SessionId,
     val startTime: Long,
     val endTime: Long,
     val distanceKm: Double,

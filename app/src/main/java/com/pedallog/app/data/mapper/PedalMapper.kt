@@ -4,11 +4,12 @@ import com.pedallog.app.data.model.PointEntity
 import com.pedallog.app.data.model.SessionEntity
 import com.pedallog.app.domain.model.PedalPoint
 import com.pedallog.app.domain.model.PedalSession
+import com.pedallog.app.domain.model.SessionId
 
 object PedalMapper {
     fun toDomainSession(entity: SessionEntity): PedalSession {
         return PedalSession(
-            syncUuid = entity.syncUuid,
+            syncUuid = SessionId(entity.syncUuid),
             startTime = entity.startTime,
             endTime = entity.endTime,
             distanceKm = entity.distanceKm,
@@ -21,7 +22,7 @@ object PedalMapper {
 
     fun toEntitySession(domain: PedalSession): SessionEntity {
         return SessionEntity(
-            syncUuid = domain.syncUuid,
+            syncUuid = domain.syncUuid.value,
             startTime = domain.startTime,
             endTime = domain.endTime,
             distanceKm = domain.distanceKm,

@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.pedallog.app.R
 import com.pedallog.app.databinding.ActivityShareBinding
 import com.pedallog.app.domain.model.PedalPoint
+import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.repository.PedalRepositoryImpl
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +30,7 @@ import java.util.Locale
 class ShareActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityShareBinding
-    private var syncUuid: String? = null
+    private var syncUuid: SessionId? = null
     private var points: List<PedalPoint> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +38,7 @@ class ShareActivity : AppCompatActivity() {
         binding = ActivityShareBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        syncUuid = intent.getStringExtra("SYNC_UUID")
+        syncUuid = intent.getStringExtra("SYNC_UUID")?.let { SessionId(it) }
         val distance = intent.getStringExtra("DISTANCE") ?: "0.0 km"
         val duration = intent.getStringExtra("DURATION") ?: "00:00:00"
         val elev = intent.getStringExtra("ELEVATION") ?: "0 m"

@@ -63,7 +63,7 @@ class SessionListFragment : Fragment() {
             },
             onShareGif = { session ->
                 val intent = Intent(requireContext(), ShareActivity::class.java).apply {
-                    putExtra("SYNC_UUID", session.syncUuid)
+                    putExtra("SYNC_UUID", session.syncUuid.value)
                     putExtra("DISTANCE", String.format(Locale.US, "%.2f km", session.distanceKm))
                     putExtra("DURATION", SessionFormatter.formatDuration(session.durationMs))
                     putExtra("ELEVATION", String.format(Locale.US, "%.0f m", session.totalAscent))

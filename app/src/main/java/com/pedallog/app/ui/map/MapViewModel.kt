@@ -9,6 +9,7 @@ import android.util.Log
 import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.repository.PedalRepositoryImpl
 import com.pedallog.app.domain.model.PedalSession
+import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.domain.repository.PedalRepository
 import com.pedallog.app.domain.usecase.ExportGpxUseCase
 import com.pedallog.app.domain.usecase.GetGeoJsonPathUseCase
@@ -142,7 +143,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteSession(syncUuid: String) {
+    fun deleteSession(syncUuid: SessionId) {
         viewModelScope.launch {
             repository.deleteSession(syncUuid)
         }

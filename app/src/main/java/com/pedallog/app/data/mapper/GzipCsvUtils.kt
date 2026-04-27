@@ -2,6 +2,7 @@ package com.pedallog.app.data.mapper
 
 import com.pedallog.app.domain.model.PedalPoint
 import com.pedallog.app.domain.model.PedalSession
+import com.pedallog.app.domain.model.SessionId
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 import java.util.zip.GZIPInputStream
@@ -91,7 +92,7 @@ object GzipCsvUtils {
                     val parts = line.split(",")
                     if (parts.size >= 7 && session == null) {
                         session = PedalSession(
-                            syncUuid = parts[0],
+                            syncUuid = SessionId(parts[0]),
                             startTime = parts[1].toLongOrNull() ?: 0L,
                             endTime = parts[2].toLongOrNull() ?: 0L,
                             distanceKm = parts[3].toDoubleOrNull() ?: 0.0,

@@ -5,6 +5,7 @@ import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.mapper.PedalMapper
 import com.pedallog.app.domain.model.PedalPoint
 import com.pedallog.app.domain.model.PedalSession
+import com.pedallog.app.domain.model.SessionId
 import com.pedallog.app.domain.repository.PedalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +32,8 @@ class PedalRepositoryImpl(
         }
     }
 
-    override fun getPointsForSession(syncUuid: String): Flow<List<PedalPoint>> {
-        return db.pedalDao().getPointsForSession(syncUuid).map { entities ->
+    override fun getPointsForSession(syncUuid: SessionId): Flow<List<PedalPoint>> {
+        return db.pedalDao().getPointsForSession(syncUuid.value).map { entities ->
             entities.map { PedalMapper.toDomainPoint(it) }
         }
     }
@@ -43,16 +44,16 @@ class PedalRepositoryImpl(
         }
     }
 
-    override suspend fun getSessionIdByUuid(syncUuid: String): Long? = withContext(Dispatchers.IO) {
-        return@withContext db.pedalDao().getSessionByUuid(syncUuid)?.id
+    override suspend fun getSessionIdByUuid(syncUuid: SessionId): Long? = withContext(Dispatchers.IO) {
+        return@withContext db.pedalDao().getSessionByUuid(syncUuid.value)?.id
     }
 
-    override suspend fun sessionExists(syncUuid: String): Boolean = withContext(Dispatchers.IO) {
-        return@withContext db.pedalDao().getSessionByUuid(syncUuid) != null
+    override suspend fun sessionExists(syncUuid: SessionId): Boolean = withContext(Dispatchers.IO) {
+        return@withContext db.pedalDao().getSessionByUuid(syncUuid.value) != null
     }
 
-    override suspend fun deleteSession(syncUuid: String) = withContext(Dispatchers.IO) {
-        db.pedalDao().deleteSession(syncUuid)
+    override suspend fun deleteSession(syncUuid: SessionId) = withContext(Dispatchers.IO) {
+        db.pedalDao().deleteSession(syncUuid.value)
     }
 
     override suspend fun deleteAllSessions() = withContext(Dispatchers.IO) {
