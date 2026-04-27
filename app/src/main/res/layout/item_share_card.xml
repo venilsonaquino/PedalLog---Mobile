@@ -82,12 +82,11 @@
             </LinearLayout>
 
             <!-- Metrics Overlay -->
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/llMetricsOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:orientation="vertical"
                 android:padding="24dp"
                 android:background="@drawable/gradient_shadow_bottom">
 
@@ -98,52 +97,58 @@
                     android:text="Pedal Matinal"
                     android:textColor="@color/white"
                     android:textSize="26sp"
-                    android:fontFamily="sans-serif-black" />
+                    android:fontFamily="sans-serif-black"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
+                <!-- Distance Column -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/llDistCol"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:orientation="horizontal"
-                    android:gravity="bottom">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginEnd="32dp">
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
-                            <ImageView android:id="@+id/ivDistIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_route" app:tint="#B3FFFFFF" />
-                            <TextView android:id="@+id/tvDistLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" DISTÂNCIA" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
-                        </LinearLayout>
-                        <TextView android:id="@+id/tvPreviewDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.00 km" android:textColor="@color/white" android:textSize="22sp" android:fontFamily="sans-serif-medium" />
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/tvPreviewTitle"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                        <ImageView android:id="@+id/ivDistIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_route" app:tint="#B3FFFFFF" />
+                        <TextView android:id="@+id/tvDistLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" DISTÂNCIA" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
-                            <ImageView android:id="@+id/ivTimeIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_clock" app:tint="#B3FFFFFF" />
-                            <TextView android:id="@+id/tvTimeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" TEMPO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
-                        </LinearLayout>
-                        <TextView android:id="@+id/tvPreviewTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0h 0m" android:textColor="@color/white" android:textSize="18sp" android:fontFamily="sans-serif-medium" />
-                    </LinearLayout>
+                    <TextView android:id="@+id/tvPreviewDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.00 km" android:textColor="@color/white" android:textSize="22sp" android:fontFamily="sans-serif-medium" />
                 </LinearLayout>
 
+                <!-- Time Column -->
+                <LinearLayout
+                    android:id="@+id/llTimeCol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toTopOf="@id/llDistCol"
+                    app:layout_constraintStart_toEndOf="@id/llDistCol">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                        <ImageView android:id="@+id/ivTimeIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_clock" app:tint="#B3FFFFFF" />
+                        <TextView android:id="@+id/tvTimeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" TEMPO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvPreviewTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0h 0m" android:textColor="@color/white" android:textSize="22sp" android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Elevation Column -->
                 <LinearLayout
                     android:id="@+id/llElevContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/llDistCol"
+                    app:layout_constraintStart_toStartOf="parent">
                     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
                         <ImageView android:id="@+id/ivElevIcon" android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_chart" app:tint="#B3FFFFFF" />
                         <TextView android:id="@+id/tvElevLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ELEVAÇÃO" android:textColor="#B3FFFFFF" android:textSize="10sp" android:textStyle="bold" />
                     </LinearLayout>
-                    <TextView android:id="@+id/tvPreviewElev" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 m" android:textColor="@color/white" android:textSize="18sp" android:fontFamily="sans-serif-medium" />
+                    <TextView android:id="@+id/tvPreviewElev" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 m" android:textColor="@color/white" android:textSize="22sp" android:fontFamily="sans-serif-medium" />
                 </LinearLayout>
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
