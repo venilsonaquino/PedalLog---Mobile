@@ -1,15 +1,6 @@
 package com.pedallog.app.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.pedallog.app.MainActivity
-import com.pedallog.app.R
 import com.pedallog.app.data.db.AppDatabase
 import com.pedallog.app.data.mapper.GzipCsvUtils
 import com.pedallog.app.data.repository.PedalRepositoryImpl
@@ -32,13 +23,14 @@ class PedalSyncListenerService : WearableListenerService() {
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     private lateinit var saveSyncedPedalUseCase: SaveSyncedPedalUseCase
+    private lateinit var notificationManager: SyncNotificationManager
 
     override fun onCreate() {
         super.onCreate()
         val database = AppDatabase.getDatabase(this)
         val repository = PedalRepositoryImpl(database)
         saveSyncedPedalUseCase = SaveSyncedPedalUseCase(repository)
-        createNotificationChannel()
+        notificationManager = SyncNotificationManager(this)
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -86,7 +78,7 @@ class PedalSyncListenerService : WearableListenerService() {
                             Log.d("SyncService", "Sessão $syncUuid sincronizada com ${points.size} pontos.")
                             
                             val distanceFormatted = String.format("%.2f", session.distanceKm)
-                            sendNotification("Novo pedal de $distanceFormatted km sincronizado!")
+                            notificationManager.sendSyncNotification("Novo pedal de $distanceFormatted km sincronizado!")
                         } catch (e: Exception) {
                             Log.e("SyncService", "Erro na sincronização de $syncUuid: ${e.message}")
                         }
@@ -96,45 +88,9 @@ class PedalSyncListenerService : WearableListenerService() {
         }
     }
 
-    private fun sendNotification(message: String) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_map)
-            .setContentTitle("PedalLog Sincronizado")
-            .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Sincronização"
-            val descriptionText = "Notificações de sincronização com o relógio"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
     }
-
-    companion object {
-        private const val CHANNEL_ID = "pedal_sync_channel"
-        private const val NOTIFICATION_ID = 1001
-    }
 }
+
