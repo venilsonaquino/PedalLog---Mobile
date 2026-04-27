@@ -148,16 +148,18 @@ class MapFragment : Fragment() {
         binding.tvTechnicalUuid.text = "UUID · ${session.syncUuid}"
 
         // Metrics
-        binding.tvMetricDistance.text = details.formattedDistance
-        binding.tvMetricDuration.text = details.formattedDuration
-        binding.tvMetricAvgSpeed.text  = String.format(Locale.US, "%.1f km/h", details.avgSpeedKmH)
-        binding.tvMetricMaxSpeed.text  = String.format(Locale.US, "%.1f km/h", details.maxSpeedKmH)
-        binding.tvMetricPoints.text    = details.gpsPointsCount.toString()
+        // Metrics (Split for independent styling)
+        val distParts = details.formattedDistance.split(" ")
+        binding.tvMetricDistanceValue.text = distParts.getOrNull(0) ?: "0.00"
+        binding.tvMetricDistanceUnit.text  = distParts.getOrNull(1) ?: "km"
 
-        // Apply Skeuomorphic Gradients (programmatic for precision)
-        applyTextGradient(binding.tvMetricDistance, R.color.primary, R.color.on_primary_container)
-        applyTextGradient(binding.tvMetricMaxSpeed, R.color.on_background, R.color.on_surface_variant)
-        applyTextGradient(binding.tvMetricAvgSpeed, R.color.on_background, R.color.on_surface_variant)
+        binding.tvMetricDuration.text = details.formattedDuration
+
+        binding.tvMetricAvgSpeedValue.text = String.format(Locale.US, "%.1f", details.avgSpeedKmH)
+        binding.tvMetricMaxSpeedValue.text = String.format(Locale.US, "%.1f", details.maxSpeedKmH)
+        binding.tvMetricPoints.text = details.gpsPointsCount.toString()
+
+        // tvMetricProtocol is static "GZIP+CSV" for now as per reference
 
         // Item 1+2+3: Chart with live WebView reference for map sync
         SpeedChartHelper.setup(binding.speedChart, details.trackPoints, binding.webView)
