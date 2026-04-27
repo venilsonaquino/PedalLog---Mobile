@@ -102,9 +102,41 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .speed-popup .leaflet-popup-content-wrapper {
-            background: #201F1F; color: #54E98A; border: 1px solid rgba(84, 233, 138, 0.3);
-            border-radius: 8px; font-weight: bold;
+        /* Custom Styled Popups */
+        .leaflet-popup-content-wrapper {
+            background: #201F1F !important;
+            color: #54E98A !important;
+            border: 1px solid rgba(84, 233, 138, 0.4);
+            border-radius: 12px !important;
+            padding: 4px 8px !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+        }
+        .leaflet-popup-content {
+            margin: 8px 12px !important;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .leaflet-popup-tip {
+            background: #201F1F !important;
+            border: 1px solid rgba(84, 233, 138, 0.4);
+        }
+        .leaflet-popup-close-button {
+            display: none !important;
+        }
+
+        /* Directional Arrow Icon */
+        .arrow-icon {
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none;
+        }
+        .arrow-icon div {
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            opacity: 0.9;
+            text-shadow: 0 0 3px rgba(0,0,0,0.8);
         }
     </style>
 </head>
@@ -161,6 +193,7 @@
         tileLayers.dark.addTo(map).once('load', () => document.getElementById('loading').classList.add('hidden'));
 
         var trackLayer = L.layerGroup().addTo(map);
+        var decoratorLayer = L.layerGroup().addTo(map);
         var trackPoints = [];
         var replayMarker = null;
         var speedModeActive = false;
@@ -174,51 +207,94 @@
         }
 
         function drawPoints(pointsJson) {
+            console.log("drawPoints called");
             try {
                 trackPoints = JSON.parse(pointsJson);
                 trackLayer.clearLayers();
+                decoratorLayer.clearLayers();
                 
-                if (trackPoints.length < 2) return;
+                if (!trackPoints || trackPoints.length < 2) return;
 
-                if (speedModeActive) {
-                    // Draw segments with gradient based on speed
-                    for (var i = 0; i < trackPoints.length - 1; i++) {
-                        var p1 = trackPoints[i];
-                        var p2 = trackPoints[i+1];
-                        
-                        L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
-                            color: _getSpeedColor(p1.spd),
-                            weight: 6,
-                            opacity: 0.9,
-                            lineCap: 'round'
-                        }).addTo(trackLayer);
-                    }
-                } else {
-                    // Draw solid Emerald polyline
-                    L.polyline(trackPoints.map(p => [p.lat, p.lng]), {
-                        color: '#54E98A',
+                var n = trackPoints.length;
+                
+                for (var i = 0; i < n - 1; i++) {
+                    var p1 = trackPoints[i];
+                    var p2 = trackPoints[i+1];
+                    var progress = i / (n - 1);
+                    var opacity = 0.35 + (0.6 * progress);
+                    var color = speedModeActive ? _getSpeedColor(p1.spd) : '#54E98A';
+                    
+                    L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+                        color: color,
                         weight: 6,
-                        opacity: 0.9,
+                        opacity: opacity,
                         lineCap: 'round'
                     }).addTo(trackLayer);
                 }
 
+                // Markers
+                L.circleMarker([trackPoints[0].lat, trackPoints[0].lng], {
+                    radius: 6, color: '#fff', weight: 2, fillOpacity: 1, fillColor: '#fff'
+                }).addTo(trackLayer).bindPopup("INÍCIO");
+
+                L.circleMarker([trackPoints[n-1].lat, trackPoints[n-1].lng], {
+                    radius: 8, color: '#131313', weight: 3, fillOpacity: 1, fillColor: '#54E98A'
+                }).addTo(trackLayer).bindPopup("FIM");
+
+                drawChevrons();
+
                 var bounds = L.latLngBounds(trackPoints.map(p => [p.lat, p.lng]));
                 map.fitBounds(bounds, { padding: [40, 40] });
 
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("drawPoints error:", e); }
         }
+
+        function drawChevrons() {
+            if (!decoratorLayer) return;
+            decoratorLayer.clearLayers();
+            
+            var zoom = map.getZoom();
+            if (!trackPoints || trackPoints.length < 2 || zoom < 14) return;
+
+            var accumulatedDist = 0;
+            var minPixelDist = 100; // Place arrow every 100 pixels
+
+            for (var i = 0; i < trackPoints.length - 1; i++) {
+                var p1 = L.latLng(trackPoints[i].lat, trackPoints[i].lng);
+                var p2 = L.latLng(trackPoints[i+1].lat, trackPoints[i+1].lng);
+                
+                var pt1 = map.latLngToContainerPoint(p1);
+                var pt2 = map.latLngToContainerPoint(p2);
+                
+                var dist = Math.sqrt(Math.pow(pt2.x - pt1.x, 2) + Math.pow(pt2.y - pt1.y, 2));
+                accumulatedDist += dist;
+
+                if (accumulatedDist >= minPixelDist) {
+                    var angle = Math.atan2(pt2.y - pt1.y, pt2.x - pt1.x) * 180 / Math.PI;
+
+                    L.marker(p1, {
+                        icon: L.divIcon({
+                            className: 'arrow-icon',
+                            html: '<div style="transform: rotate(' + angle + 'deg)">›</div>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        }),
+                        interactive: false
+                    }).addTo(decoratorLayer);
+                    
+                    accumulatedDist = 0; // Reset
+                }
+            }
+        }
+
+        map.on('zoomend moveend', drawChevrons);
 
         function toggleSpeedMode() {
             speedModeActive = !speedModeActive;
             if (trackPoints.length > 0) {
                 drawPoints(JSON.stringify(trackPoints));
             }
-            
             showToast(speedModeActive ? 'Modo de Velocidade Ativado' : 'Modo Sólido Ativado');
-            document.getElementById('btn-speed').classList.toggle('active', speedModeActive);
-            
-            // Adjust speed button color if active
             document.getElementById('btn-speed').style.color = speedModeActive ? '#54E98A' : '#E5E2E1';
         }
 
@@ -229,7 +305,6 @@
             setTimeout(() => t.classList.remove('visible'), 2000);
         }
 
-        // Mock function for compatibility with drawTrack calls
         function drawTrack(geo) {}
 
         function moveMarker(lat, lng, speed) {
@@ -252,6 +327,8 @@
         function focusRoute() { if (trackPoints.length > 0) map.fitBounds(L.latLngBounds(trackPoints.map(p => [p.lat, p.lng])), { padding: [40, 40] }); }
         function invalidateAndFocus() { map.invalidateSize(); focusRoute(); }
     </script>
+
+
 
 </body>
 </html>
