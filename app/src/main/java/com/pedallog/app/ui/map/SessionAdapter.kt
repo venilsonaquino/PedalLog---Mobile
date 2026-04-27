@@ -39,22 +39,23 @@ class SessionAdapter(
                     onDeleteClick(getItem(position))
                 }
             }
+            binding.btnShare.setOnClickListener {
+                // Implementation for SHARE
+            }
+            binding.btnDownload.setOnClickListener {
+                // Implementation for GPX Download
+            }
         }
 
         fun bind(session: PedalSession) {
-            val dateFormat = SimpleDateFormat("dd 'de' MMM. 'de' yyyy", Locale("pt", "BR"))
-            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            
+            val dateFormatLabel = SimpleDateFormat("MMM dd, yyyy", Locale("pt", "BR")) 
             val date = Date(session.startTime)
-            binding.tvDate.text = dateFormat.format(date)
-            binding.tvTime.text = timeFormat.format(date)
+            binding.tvDate.text = dateFormatLabel.format(date)
+            binding.tvSessionTitle.text = "Sessão de Ciclismo" // Placeholder for name
             
-            binding.tvDistance.text = String.format(Locale.US, "%.2f km", session.distanceKm)
-            
-            // Show start time in top right (tvTime) and duration in metrics row (tvDuration)
+            binding.tvDistance.text = String.format(Locale.US, "%.1f km", session.distanceKm)
             binding.tvDuration.text = session.getFormattedDuration()
-            
-            binding.tvUuid.text = "ID: ${session.syncUuid}"
+            binding.tvUuid.text = "UUID · ${session.syncUuid}"
         }
     }
 
