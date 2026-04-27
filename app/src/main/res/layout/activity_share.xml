@@ -16,7 +16,7 @@
         app:title="Compartilhar Atividade"
         app:titleTextColor="@color/white" />
 
-    <!-- Preview ViewPager (Allows swiping between 3 styles) -->
+    <!-- Preview ViewPager (Allows swiping between styles) -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerStyles"
         android:layout_width="0dp"
