@@ -5,8 +5,12 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 
+/**
+ * Caso de uso responsável por converter uma lista de pontos em uma String GeoJSON.
+ * SRP: Isola o formato de representação geográfica para o mapa.
+ */
 class GetGeoJsonPathUseCase {
-    fun invoke(points: List<PedalPoint>): String {
+    operator fun invoke(points: List<PedalPoint>): String {
         val coordinates = JsonArray()
         for (point in points) {
             val coord = JsonArray()

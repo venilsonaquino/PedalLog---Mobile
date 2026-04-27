@@ -120,7 +120,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             val sessionStartTime = session.startTime
-            val geoJson = if (points.isNotEmpty()) getGeoJsonPathUseCase.invoke(points) else null
+            val geoJson = if (points.isNotEmpty()) getGeoJsonPathUseCase(points) else null
             val trackPoints = points.map { pt ->
                 TrackPoint(
                     lat = pt.latitude,
@@ -173,7 +173,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 }
 
-                val gpxContent = exportGpxUseCase.invoke(session, points)
+                val gpxContent = exportGpxUseCase(session, points)
                 val dateTag = SimpleDateFormat("yyyyMMdd_HHmm", Locale.US).format(Date(session.startTime))
                 val fileName = "PedalLog_$dateTag"
                 

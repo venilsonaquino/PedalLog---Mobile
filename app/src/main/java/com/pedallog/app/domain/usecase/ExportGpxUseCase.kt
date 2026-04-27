@@ -18,7 +18,7 @@ class ExportGpxUseCase {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
-    fun invoke(session: PedalSession, points: List<PedalPoint>): String {
+    operator fun invoke(session: PedalSession, points: List<PedalPoint>): String {
         val createdAt = isoFormat.format(Date(session.startTime))
         val name = "PedalLog ${createdAt.substring(0, 10)}" // e.g. "PedalLog 2026-04-26"
 
