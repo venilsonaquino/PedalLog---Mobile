@@ -7,23 +7,23 @@
 
     <fragment
         android:id="@+id/SessionListFragment"
-        android:name="com.pedallog.app.ui.map.SessionListFragment"
+        android:name="com.pedallog.app.modules.session.presentation.fragments.SessionListFragment"
         android:label="Minhas Rotas"
         tools:layout="@layout/fragment_session_list">
         <action
-            android:id="@+id/action_SessionListFragment_to_MapFragment"
+            android:id="@+id/action_sessionList_to_map"
             app:destination="@id/MapFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/MapFragment"
-        android:name="com.pedallog.app.ui.map.MapFragment"
+        android:name="com.pedallog.app.modules.session.presentation.fragments.MapFragment"
         android:label="Detalhe da Sessão"
         tools:layout="@layout/fragment_map" />
 
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="com.pedallog.app.ui.map.SettingsFragment"
+        android:name="com.pedallog.app.modules.session.presentation.fragments.SettingsFragment"
         android:label="Configurações"
         tools:layout="@layout/fragment_settings" />
 </navigation>

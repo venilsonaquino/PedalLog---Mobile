@@ -25,11 +25,11 @@
         </activity>
 
         <activity
-            android:name=".ui.map.ShareActivity"
+            android:name=".modules.sharing.presentation.activities.ShareActivity"
             android:exported="false"
             android:theme="@style/Theme.PedalLogMobile" />
         <service
-            android:name=".service.PedalSyncListenerService"
+            android:name=".modules.sync.infraestructure.services.PedalSyncListenerService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />

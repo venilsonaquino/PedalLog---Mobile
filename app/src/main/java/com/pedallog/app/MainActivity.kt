@@ -13,14 +13,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initializeUi()
+        setupNavigation()
+    }
 
+    private fun initializeUi() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+    }
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        binding.bottomNavigation.setupWithNavController(navController)
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment
+        
+        navHostFragment?.navController?.let { controller ->
+            binding.bottomNavigation.setupWithNavController(controller)
+        }
     }
 }
