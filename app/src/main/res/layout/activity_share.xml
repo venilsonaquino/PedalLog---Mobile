@@ -16,33 +16,22 @@
         app:title="Compartilhar Atividade"
         app:titleTextColor="@color/white" />
 
-    <!-- Preview ViewPager (Allows swiping between styles) -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPagerStyles"
+    <!-- Card Preview Container -->
+    <FrameLayout
+        android:id="@+id/cardContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginVertical="32dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
         android:paddingHorizontal="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/llIndicators"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-    <!-- Indicators -->
-    <LinearLayout
-        android:id="@+id/llIndicators"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/tvShareTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-        <View android:id="@+id/indicator0" android:layout_width="6dp" android:layout_height="6dp" android:background="@drawable/indicator_active" />
-        <View android:id="@+id/indicator1" android:layout_width="6dp" android:layout_height="6dp" android:layout_marginStart="8dp" android:background="@drawable/indicator_inactive" />
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        
+        <include 
+            android:id="@+id/cardView"
+            layout="@layout/item_share_card" />
+    </FrameLayout>
 
     <!-- Share Actions -->
     <TextView

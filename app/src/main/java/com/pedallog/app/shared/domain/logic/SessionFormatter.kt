@@ -31,4 +31,14 @@ object SessionFormatter {
         val dateFormat = java.text.SimpleDateFormat("MMM dd, yyyy", Locale("pt", "BR"))
         return dateFormat.format(java.util.Date(startTime))
     }
+
+    fun getSessionPeriodName(startTime: Long): String {
+        val calendar = java.util.Calendar.getInstance().apply { timeInMillis = startTime }
+        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+        return when (hour) {
+            in 5..11 -> "Pedal Matinal"
+            in 12..17 -> "Pedal Vespertino"
+            else -> "Pedal Noturno"
+        }
+    }
 }
