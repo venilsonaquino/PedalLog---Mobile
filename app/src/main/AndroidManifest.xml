@@ -12,11 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PedalLogMobile">
+        android:theme="@style/Theme.PedalLog">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.PedalLogMobile">
+            android:theme="@style/Theme.PedalLog">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,7 +27,7 @@
         <activity
             android:name=".modules.sharing.presentation.activities.ShareActivity"
             android:exported="false"
-            android:theme="@style/Theme.PedalLogMobile" />
+            android:theme="@style/Theme.PedalLog" />
         <service
             android:name=".modules.sync.infraestructure.services.PedalSyncListenerService"
             android:exported="true">

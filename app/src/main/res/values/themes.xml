@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.PedalLogMobile" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Base.Theme.PedalLog" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Color Palette -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
@@ -21,7 +21,7 @@
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 
-    <style name="Theme.PedalLogMobile" parent="Base.Theme.PedalLogMobile" />
+    <style name="Theme.PedalLog" parent="Base.Theme.PedalLog" />
 
     <style name="CustomBottomSheetDialog" parent="Theme.Material3.Dark.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/CustomBottomSheet</item>

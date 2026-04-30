@@ -23,6 +23,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PedalLogMobile"
+rootProject.name = "PedalLog"
 include(":app")
  

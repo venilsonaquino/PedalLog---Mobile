@@ -1,4 +1,4 @@
-package com.example.pedallogmobile
+package com.example.PedalLog
 
 import org.junit.Test
 
