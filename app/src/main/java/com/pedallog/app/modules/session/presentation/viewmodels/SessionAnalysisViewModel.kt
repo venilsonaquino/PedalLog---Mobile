@@ -28,30 +28,34 @@ class SessionAnalysisViewModel(application: Application) : AndroidViewModel(appl
     private val _sessionDetails = MutableStateFlow<SessionMetrics?>(null)
     val sessionDetails: StateFlow<SessionMetrics?> = _sessionDetails
 
+    private var currentJob: kotlinx.coroutines.Job? = null
+
     fun loadSession(session: PedalSession) {
-        viewModelScope.launch {
+        currentJob?.cancel()
+        currentJob = viewModelScope.launch {
             _sessionDetails.value = null
-            val points = loadSessionPoints(session.id).firstOrNull() ?: emptyList()
             
             val startTime = session.details.timeRange.start.milliseconds
             
-            _sessionDetails.value = SessionMetrics(
-                session = session,
-                geoJson = if (points.isNotEmpty()) getGeoJsonPath(points) else null,
-                gpsPointsCount = points.size,
-                maxSpeedKmH = SessionMetricsCalculator.calculateMaxSpeedKmH(points),
-                avgSpeedKmH = SessionMetricsCalculator.calculateAverageSpeedKmH(points),
-                formattedDuration = SessionFormatter.formatDuration(session.details.timeRange.calculateTotalDuration().milliseconds),
-                formattedDistance = session.details.metrics.distance.toFormattedString(),
-                trackPoints = points.map { pt -> 
-                    TrackPoint(
-                        lat = pt.coordinate.latitude, 
-                        lng = pt.coordinate.longitude, 
-                        speedKmH = pt.details.speed.kilometersPerHour.toFloat(), 
-                        timeOffsetMs = pt.details.timestamp.milliseconds - startTime
-                    ) 
-                }
-            )
+            loadSessionPoints(session.id).collect { points ->
+                _sessionDetails.value = SessionMetrics(
+                    session = session,
+                    geoJson = if (points.isNotEmpty()) getGeoJsonPath(points) else null,
+                    gpsPointsCount = points.size,
+                    maxSpeedKmH = SessionMetricsCalculator.calculateMaxSpeedKmH(points),
+                    avgSpeedKmH = SessionMetricsCalculator.calculateAverageSpeedKmH(points),
+                    formattedDuration = SessionFormatter.formatDuration(session.details.timeRange.calculateTotalDuration().milliseconds),
+                    formattedDistance = SessionFormatter.formatDistance(session.details.metrics.distance.kilometers),
+                    trackPoints = points.map { pt -> 
+                        TrackPoint(
+                            lat = pt.coordinate.latitude, 
+                            lng = pt.coordinate.longitude, 
+                            speedKmH = pt.details.speed.kilometersPerHour.toFloat(), 
+                            timeOffsetMs = pt.details.timestamp.milliseconds - startTime
+                        ) 
+                    }
+                )
+            }
         }
     }
 }

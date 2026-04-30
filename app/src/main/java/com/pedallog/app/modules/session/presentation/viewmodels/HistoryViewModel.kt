@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel responsável pela listagem de sessões e métricas acumuladas.
@@ -25,4 +26,10 @@ class HistoryViewModel(
     val totalDistanceKm: StateFlow<Double> = sessions.map { list ->
         list.sumOf { it.details.metrics.distance.kilometers }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+
+    fun deleteSession(sessionId: com.pedallog.app.modules.session.domain.valueobjects.SessionId) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            sessionRepository.deleteSession(sessionId)
+        }
+    }
 }

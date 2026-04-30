@@ -46,7 +46,16 @@ class SessionListFragment : Fragment(R.layout.fragment_session_list) {
                 analysisViewModel.loadSession(session)
                 findNavController().navigate(R.id.action_sessionList_to_map)
             },
-            onDeleteClick = { /* historyViewModel.deleteSession(it.id) */ },
+            onDeleteClick = { session -> 
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Excluir sessão")
+                    .setMessage("Tem certeza de que deseja excluir esta sessão? Esta ação não pode ser desfeita.")
+                    .setPositiveButton("Excluir") { _, _ ->
+                        historyViewModel.deleteSession(session.id)
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            },
             onDownloadGpx = { exportViewModel.exportSessionToDownloads(it) },
             onShareGif = { 
                 currentSessionIdForShare = it.id.value
