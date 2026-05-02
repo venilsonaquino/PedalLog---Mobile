@@ -41,7 +41,7 @@ class PedalSyncListenerService : WearableListenerService() {
                 if (syncUuid != null) {
                     scope.launch {
                         try {
-                            val payload = SyncDataParser.parse(dataMap) ?: return@launch
+                            val payload = SyncDataParser.parse(this@PedalSyncListenerService, dataMap) ?: return@launch
                             
                             saveSyncedPedalUseCase(payload.session, payload.points)
                             Log.d("SyncService", "Sessão ${payload.session.syncUuid} sincronizada com ${payload.points.size} pontos.")

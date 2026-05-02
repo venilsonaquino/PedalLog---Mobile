@@ -1,7 +1,10 @@
 package com.pedallog.app.service
 
+import android.content.Context
 import com.google.android.gms.wearable.DataMap
+import com.google.android.gms.wearable.Wearable
 import com.pedallog.app.data.mapper.GzipCsvUtils
+import kotlinx.coroutines.tasks.await
 import com.pedallog.app.domain.model.PedalPoint
 import com.pedallog.app.domain.model.PedalSession
 import com.pedallog.app.domain.model.SessionId
@@ -20,13 +23,17 @@ data class SyncPayload(
  */
 object SyncDataParser {
 
-    fun parse(dataMap: DataMap): SyncPayload? {
+    suspend fun parse(context: Context, dataMap: DataMap): SyncPayload? {
         val syncUuid = dataMap.getString("sync_uuid") ?: return null
         val startTime = dataMap.getLong("start_time")
         val endTime = dataMap.getLong("end_time")
         val totalDistance = dataMap.getFloat("total_distance")
         val activeDurationMs = dataMap.getLong("active_duration_ms")
-        val pointsGzip = dataMap.getByteArray("points_gz") ?: return null
+        
+        val asset = dataMap.getAsset("points_asset") ?: return null
+        val dataClient = Wearable.getDataClient(context)
+        val fd = dataClient.getFdForAsset(asset).await()
+        val pointsGzip = fd.inputStream.use { it.readBytes() }
 
         val points = GzipCsvUtils.decompressAndParsePoints(pointsGzip)
         
