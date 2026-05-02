@@ -30,7 +30,13 @@ class TracePainter(
         val canvas = Canvas(bitmap)
         val path = Path().apply {
             moveTo(mapper.getX(points[0].longitude), mapper.getY(points[0].latitude))
-            for (j in 1..index) lineTo(mapper.getX(points[j].longitude), mapper.getY(points[j].latitude))
+            for (j in 1..index) {
+                if (points[j - 1].segmentBreak == 1) {
+                    moveTo(mapper.getX(points[j].longitude), mapper.getY(points[j].latitude))
+                } else {
+                    lineTo(mapper.getX(points[j].longitude), mapper.getY(points[j].latitude))
+                }
+            }
         }
         canvas.drawPath(path, paintTrace)
         val cx = mapper.getX(points[index].longitude)

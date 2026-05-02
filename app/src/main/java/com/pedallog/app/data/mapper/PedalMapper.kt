@@ -40,7 +40,8 @@ object PedalMapper {
             longitude = entity.longitude,
             altitude = entity.altitude,
             speed = entity.speed,
-            accuracy = entity.accuracy
+            accuracy = entity.accuracy,
+            segmentBreak = entity.segmentBreak
         )
     }
 
@@ -52,7 +53,8 @@ object PedalMapper {
             longitude = domain.longitude,
             altitude = domain.altitude,
             speed = domain.speed,
-            accuracy = domain.accuracy
+            accuracy = domain.accuracy,
+            segmentBreak = domain.segmentBreak
         )
     }
 }

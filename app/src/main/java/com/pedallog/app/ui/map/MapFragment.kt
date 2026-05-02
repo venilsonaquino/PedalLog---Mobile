@@ -194,7 +194,7 @@ class MapFragment : Fragment() {
 
         if (details.trackPoints.isNotEmpty()) {
             val pointsJson = details.trackPoints.joinToString(",", "[", "]") { pt ->
-                """{"lat":${pt.lat},"lng":${pt.lng},"spd":${pt.speedKmH}}"""
+                """{"lat":${pt.lat},"lng":${pt.lng},"spd":${pt.speedKmH},"seg":${pt.segmentBreak}}"""
             }
             binding.webView.evaluateJavascript(
                 "javascript:drawPoints('${pointsJson.replace("'", "\\'")}');", null

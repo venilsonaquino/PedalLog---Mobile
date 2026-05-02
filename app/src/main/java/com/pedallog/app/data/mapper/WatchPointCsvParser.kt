@@ -22,7 +22,8 @@ object WatchPointCsvParser {
                         speed = parts[2].toFloatOrNull() ?: 0f,
                         timestamp = parts[4].toLongOrNull() ?: 0L,
                         altitude = 0.0,
-                        accuracy = 0f
+                        accuracy = 0f,
+                        segmentBreak = parts.getOrNull(5)?.toIntOrNull() ?: 0
                     )
                 )
             }

@@ -6,5 +6,6 @@ data class PedalPoint(
     val longitude: Double,
     val altitude: Double,
     val speed: Float,
-    val accuracy: Float
+    val accuracy: Float,
+    val segmentBreak: Int = 0
 )

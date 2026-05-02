@@ -134,7 +134,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     lat = pt.latitude,
                     lng = pt.longitude,
                     speedKmH = pt.speed,
-                    timeOffsetMs = pt.timestamp - sessionStartTime
+                    timeOffsetMs = pt.timestamp - sessionStartTime,
+                    segmentBreak = pt.segmentBreak
                 )
             }
             
@@ -172,7 +173,8 @@ data class TrackPoint(
     val lat: Double,
     val lng: Double,
     val speedKmH: Float,
-    val timeOffsetMs: Long
+    val timeOffsetMs: Long,
+    val segmentBreak: Int = 0
 )
 
 data class SessionMetrics(

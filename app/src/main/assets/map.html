@@ -220,6 +220,11 @@
                 for (var i = 0; i < n - 1; i++) {
                     var p1 = trackPoints[i];
                     var p2 = trackPoints[i+1];
+                    
+                    if (p1.seg === 1) {
+                        continue;
+                    }
+                    
                     var progress = i / (n - 1);
                     var opacity = 0.35 + (0.6 * progress);
                     var color = speedModeActive ? _getSpeedColor(p1.spd) : '#54E98A';
@@ -260,6 +265,11 @@
             var minPixelDist = 100; // Place arrow every 100 pixels
 
             for (var i = 0; i < trackPoints.length - 1; i++) {
+                if (trackPoints[i].seg === 1) {
+                    accumulatedDist = 0;
+                    continue;
+                }
+                
                 var p1 = L.latLng(trackPoints[i].lat, trackPoints[i].lng);
                 var p2 = L.latLng(trackPoints[i+1].lat, trackPoints[i+1].lng);
                 
