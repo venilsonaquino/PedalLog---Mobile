@@ -215,29 +215,62 @@
                 
                 if (!trackPoints || trackPoints.length < 2) return;
 
-                var n = trackPoints.length;
+                var segments = [];
+                var currentSegment = [];
                 
-                for (var i = 0; i < n - 1; i++) {
-                    var p1 = trackPoints[i];
-                    var p2 = trackPoints[i+1];
+                for (var i = 0; i < trackPoints.length; i++) {
+                    var p = trackPoints[i];
+                    currentSegment.push(p);
                     
-                    if (p1.seg === 1) {
-                        continue;
+                    if (p.seg === 1 && currentSegment.length > 0) {
+                        segments.push(currentSegment);
+                        currentSegment = [];
                     }
-                    
-                    var progress = i / (n - 1);
-                    var opacity = 0.35 + (0.6 * progress);
-                    var color = speedModeActive ? _getSpeedColor(p1.spd) : '#54E98A';
-                    
-                    L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
-                        color: color,
-                        weight: 6,
-                        opacity: opacity,
-                        lineCap: 'round'
-                    }).addTo(trackLayer);
+                }
+                if (currentSegment.length > 0) {
+                    segments.push(currentSegment);
                 }
 
+                segments.forEach(function(seg) {
+                    if (seg.length < 2) return;
+
+                    if (!speedModeActive) {
+                        var coords = seg.map(function(p) { return [p.lat, p.lng]; });
+                        L.polyline(coords, {
+                            color: '#54E98A',
+                            weight: 6,
+                            opacity: 0.9,
+                            lineCap: 'round',
+                            lineJoin: 'round'
+                        }).addTo(trackLayer);
+                    } else {
+                        var currentColor = _getSpeedColor(seg[0].spd);
+                        var currentCoords = [ [seg[0].lat, seg[0].lng] ];
+                        
+                        for (var j = 1; j < seg.length; j++) {
+                            var p = seg[j];
+                            var pColor = _getSpeedColor(p.spd);
+                            
+                            currentCoords.push([p.lat, p.lng]);
+                            
+                            if (pColor !== currentColor || j === seg.length - 1) {
+                                L.polyline(currentCoords, {
+                                    color: currentColor,
+                                    weight: 6,
+                                    opacity: 0.9,
+                                    lineCap: 'round',
+                                    lineJoin: 'round'
+                                }).addTo(trackLayer);
+                                
+                                currentCoords = [ [p.lat, p.lng] ];
+                                currentColor = pColor;
+                            }
+                        }
+                    }
+                });
+
                 // Markers
+                var n = trackPoints.length;
                 L.circleMarker([trackPoints[0].lat, trackPoints[0].lng], {
                     radius: 6, color: '#fff', weight: 2, fillOpacity: 1, fillColor: '#fff'
                 }).addTo(trackLayer).bindPopup("INÍCIO");
